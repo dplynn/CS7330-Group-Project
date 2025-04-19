@@ -1,6 +1,6 @@
 # Database Group Project
 
-Database Creation (Davis) - \b{DONE}
+Database Creation (Davis) - *DONE*
 Insert Statements for Each Table (Davis)
 UI (Bonita)
 Querying Statements / General Implementation (Lucas)
