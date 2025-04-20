@@ -66,8 +66,11 @@ def create_tables(connection): #Creates the tables in the database
             orig_time_posted DATETIME,
             orig_text TEXT,
             PRIMARY KEY (username, social_media, time_posted)
+          
         )
         """
+        #  FOREIGN KEY (username, social_media) REFERENCES user(username, social_media), / Foreign Key to user table NYI
+        # FOREIGN KEY (orig_user, orig_social_media, orig_time_posted) REFERENCES Post(username, social_media, time_posted) / Foreign Key to user table. NYI
         cursor.execute(create_table_query)
 
     with connection.cursor() as cursor: # Create Project Table
@@ -91,11 +94,11 @@ def create_tables(connection): #Creates the tables in the database
             post_time_posted DATETIME NOT NULL,
             field VARCHAR(40) NOT NULL,
             result VARCHAR(40),
-            PRIMARY KEY (project_name, post_username, post_social_media, post_time_posted),
-            FOREIGN KEY (post_username, post_social_media, post_time_posted) REFERENCES Post(username, social_media, time_posted),
-            FOREIGN KEY (project_name) REFERENCES Project(project_name)
+            PRIMARY KEY (project_name, post_username, post_social_media, post_time_posted)
         )
         """
+        # FOREIGN KEY (post_username, post_social_media, post_time_posted) REFERENCES Post(username, social_media, time_posted), # Foreign Key to Post table. NYI
+        # FOREIGN KEY (project_name) REFERENCES Project(project_name) # Foreign Key to Project table. NYI
         cursor.execute(create_table_query)
 
 def clear_tables(connection): #Clears the tables in the database
@@ -186,3 +189,27 @@ def read_post_data(file_path): #Reads the post data from a CSV file and returns 
     # Convert the DataFrame to a list of tuples
     post_data = [tuple(row) for row in df.values]
     return post_data
+
+def read_project_data(file_path): #Reads the project data from a CSV file and returns it as a list of tuples, for testing ONLY
+    #Labels: project_name,project_manager,institute,start_date,end_date
+    df = pd.read_csv(file_path, skiprows=1, header=None, names=['project_name', 'project_manager', 'institute', 'start_date', 'end_date'])
+    # Convert the 'start_date' and 'end_date' columns to datetime
+    df['start_date'] = pd.to_datetime(df['start_date'], errors='coerce')
+    df['end_date'] = pd.to_datetime(df['end_date'], errors='coerce')
+    # Remove rows with invalid datetime values
+    df = df.dropna(subset=['start_date', 'end_date'])
+    # Convert the DataFrame to a list of tuples
+    project_data = [tuple(row) for row in df.values]
+    return project_data
+
+def read_projectdata_data(file_path): #Reads the project data from a CSV file and returns it as a list of tuples, for testing ONLY
+    #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
+    df = pd.read_csv(file_path, skiprows=1, header=None, names=['project_name', 'post_username', 'post_social_media', 'post_time_posted', 'field', 'result'])
+    # Convert the 'post_time_posted' column to datetime
+    df['post_time_posted'] = pd.to_datetime(df['post_time_posted'], format='%Y-%m-%d %H:%M:%S', errors='coerce')    # Remove rows with invalid datetime values
+    df = df.dropna(subset=['post_time_posted'])
+    #If result does not exist, set it to None
+    df['result'] = df['result'].fillna('None')
+    # Convert the DataFrame to a list of tuples
+    projectdata_data = [tuple(row) for row in df.values]
+    return projectdata_data

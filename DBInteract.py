@@ -92,10 +92,29 @@ def insert_post(connection, post_data): # Insert post data into the database
         cursor.execute(insert_query, post_data)
     connection.commit()
 def insert_project(connection, project_data): # Insert projects into the database
+    #project_name, project_manager, institute, start_date, end_date
     #check if project exists
     if fetch_project(connection, project_data[0]) is not None:
         print("Project already exists in the database.")
         return
+    #check if project_data is valid
+    if len(project_data) != 5:
+        print("Invalid project data. Expected 5 fields.")
+        return
+    if not isinstance(project_data[0], str) or not isinstance(project_data[1], str):
+        print("Invalid project data. Project name and project manager should be strings.")
+        return
+    if not isinstance(project_data[2], str):
+        print("Invalid project data. Institute should be a string.")
+        return
+    if not isinstance(project_data[3], datetime.datetime) or not isinstance(project_data[4], datetime.datetime):
+        print("Invalid project data. Start date and end date should be datetime objects.")
+        return
+    if project_data[3] > project_data[4]:
+        print("Invalid project data. Start date should be before end date.")
+        print(f"Start date: {project_data[3]}, End date: {project_data[4]}")
+        return
+    
     with connection.cursor() as cursor:
         insert_query = """
         INSERT INTO Project (project_name, project_manager, institute, start_date, end_date)
@@ -104,9 +123,26 @@ def insert_project(connection, project_data): # Insert projects into the databas
         cursor.execute(insert_query, project_data)
     connection.commit()
 def insert_projectdata(connection, project_data): # Insert project data into the database
+    #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
     #check if projectdata exists
     if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None:
         print("ProjectData already exists in the database.")
+        return
+    #check if project_data is valid
+    if len(project_data) != 6:
+        print("Invalid project data. Expected 6 fields.")
+        return
+    if not isinstance(project_data[0], str) or not isinstance(project_data[1], str):
+        print("Invalid project data. Project name and post username should be strings.")
+        return
+    if not isinstance(project_data[2], str):
+        print("Invalid project data. Post social media should be a string.")
+        return
+    if not isinstance(project_data[3], datetime.datetime):
+        print("Invalid project data. Post time posted should be a datetime object.")
+        return
+    if not isinstance(project_data[4], str):
+        print("Invalid project data. Field should be a string.")
         return
     with connection.cursor() as cursor:
         insert_query = """
