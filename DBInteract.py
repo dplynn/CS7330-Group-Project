@@ -3,7 +3,7 @@ import csv
 import pandas as pd
 import datetime
 
-def insert_user(connection, user_data):
+def insert_user(connection, user_data): # Insert user data into the database
     #check if user exists
     if fetch_user(connection, user_data[0], user_data[1]) is not None:
         print("User already exists in the database.")
@@ -34,19 +34,64 @@ def insert_user(connection, user_data):
         """
         cursor.execute(insert_query, user_data)
     connection.commit()   
-def insert_post(connection, post_data):
-    #check if post exists
+def insert_post(connection, post_data): # Insert post data into the database
+    #username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted,orig_text
+    post_data = list(post_data) if isinstance(post_data, tuple) else post_data
     if fetch_post(connection, post_data[0], post_data[1], post_data[2]) is not None:
         print("Post already exists in the database.")
         return
+    #check if post_data is valid
+    if len(post_data) != 15:
+        print("Invalid post data. Expected 15 fields.")
+        return
+    if not isinstance(post_data[0], str) or not isinstance(post_data[1], str):
+        print("Invalid post data. Username and social media should be strings.")
+        # print types for debugging
+        print(f"Username type: {type(post_data[0])}, Social media type: {type(post_data[1])}")
+        return
+    if not isinstance(post_data[2], datetime.datetime):
+        print("Invalid post data. Time posted should be a datetime object.")
+        return
+    if not isinstance(post_data[3], str):
+        print("Invalid post data. Text should be a string.")
+        return
+    if not isinstance(post_data[4], str) or not isinstance(post_data[5], str) or not isinstance(post_data[6], str):
+        print("Invalid post data. City, state, and country should be strings.")
+        return
+    if not isinstance(post_data[7], int) or not isinstance(post_data[8], int):
+        print("Invalid post data. Number of likes and dislikes should be integers.")
+        return
+    if post_data[7] < 0 or post_data[8] < 0:
+        print("Invalid post data. Number of likes and dislikes should be positive integers.")
+        return
+    if not isinstance(post_data[9], bool) or not isinstance(post_data[10], bool):
+        print("Invalid post data. Multimedia and is repost should be boolean values.")
+        return
+    if post_data[10] and (post_data[11] is None or post_data[12] is None or post_data[14] is None):
+        print("Invalid post data. Original user, social media, time posted, and text should not be None if is repost is True.")
+        return
+    if post_data[10] and (not isinstance(post_data[11], str) or not isinstance(post_data[12], str)):
+        print("Invalid post data. Original user, social media, and text should be strings.")
+        #types for debugging
+        print(f"Original user type: {type(post_data[11])}, Original social media type: {type(post_data[12])}, Original text type: {type(post_data[14])}")
+        return
+    if not isinstance(post_data[13], datetime.datetime):
+        print("Invalid post data. Original time posted should be a datetime object.")
+        return
+    #convert orig_user, orig_social_media, orig_time_posted, orig_text to null if is_repost is False
+    if not post_data[10]:
+        post_data[11] = None
+        post_data[12] = None
+        post_data[13] = None
+        post_data[14] = None
     with connection.cursor() as cursor:
         insert_query = """
-        INSERT INTO Post (username, social_media, time_posted, text, city, state, country, num_likes, num_dislikes, multimedia, is_repost)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO Post (username, social_media, time_posted, text, city, state, country, num_likes, num_dislikes, multimedia, is_repost, orig_user, orig_social_media, orig_time_posted, orig_text)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(insert_query, post_data)
     connection.commit()
-def insert_project(connection, project_data):
+def insert_project(connection, project_data): # Insert projects into the database
     #check if project exists
     if fetch_project(connection, project_data[0]) is not None:
         print("Project already exists in the database.")
@@ -58,7 +103,7 @@ def insert_project(connection, project_data):
         """
         cursor.execute(insert_query, project_data)
     connection.commit()
-def insert_projectdata(connection, project_data):
+def insert_projectdata(connection, project_data): # Insert project data into the database
     #check if projectdata exists
     if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None:
         print("ProjectData already exists in the database.")
@@ -71,7 +116,7 @@ def insert_projectdata(connection, project_data):
         cursor.execute(insert_query, project_data)
     connection.commit()
 
-def fetch_user(connection, username, social_media):
+def fetch_user(connection, username, social_media): # Fetch user data from the database
     with connection.cursor() as cursor:
         select_query = """
         SELECT * FROM user WHERE username = %s AND social_media = %s
@@ -79,7 +124,7 @@ def fetch_user(connection, username, social_media):
         cursor.execute(select_query, (username, social_media))
         result = cursor.fetchone()
     return result
-def fetch_post(connection, username, social_media, time_posted):
+def fetch_post(connection, username, social_media, time_posted): # Fetch post data from the database
     with connection.cursor() as cursor:
         select_query = """
         SELECT * FROM Post WHERE username = %s AND social_media = %s AND time_posted = %s
@@ -87,7 +132,7 @@ def fetch_post(connection, username, social_media, time_posted):
         cursor.execute(select_query, (username, social_media, time_posted))
         result = cursor.fetchone()
     return result
-def fetch_project(connection, project_name):
+def fetch_project(connection, project_name): # Fetch a project from the database
     with connection.cursor() as cursor:
         select_query = """
         SELECT * FROM Project WHERE project_name = %s
@@ -95,7 +140,7 @@ def fetch_project(connection, project_name):
         cursor.execute(select_query, (project_name,))
         result = cursor.fetchone()
     return result
-def fetch_projectdata(connection, project_name, post_username, post_social_media, post_time_posted):
+def fetch_projectdata(connection, project_name, post_username, post_social_media, post_time_posted): # Fetch project data from the database
     with connection.cursor() as cursor:
         select_query = """
         SELECT * FROM ProjectData WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s
@@ -104,7 +149,7 @@ def fetch_projectdata(connection, project_name, post_username, post_social_media
         result = cursor.fetchone()
     return result
 
-def fetch_all_users(connection):
+def fetch_all_users(connection): # Returns all users in the database
     with connection.cursor() as cursor:
         select_query = """
         SELECT * FROM user
@@ -114,7 +159,7 @@ def fetch_all_users(connection):
 
 
     return result
-def fetch_all_posts(connection):
+def fetch_all_posts(connection): # Returns all posts in the database
     result = []
     with connection.cursor() as cursor:
         select_query = """
@@ -124,7 +169,7 @@ def fetch_all_posts(connection):
         result = cursor.fetchall()
 
     return result
-def fetch_all_projects(connection):
+def fetch_all_projects(connection): # Returns all projects in the database
     with connection.cursor() as cursor:
         select_query = """
         SELECT * FROM Project
@@ -133,7 +178,7 @@ def fetch_all_projects(connection):
         result = cursor.fetchall()
 
     return result
-def fetch_all_projectdata(connection):
+def fetch_all_projectdata(connection): # Returns all project data in the database
     with connection.cursor() as cursor:
         select_query = """
         SELECT * FROM ProjectData

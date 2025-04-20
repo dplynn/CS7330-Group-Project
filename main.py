@@ -13,9 +13,13 @@ def main():
     for user in users_data:
         DBInteract.insert_user(connection, user) # Insert each user into the database
     result = DBInteract.fetch_all_users(connection) # Fetch all users from the database
-    print("All users in the database:")
+    posts_data = DBInit.read_post_data('post_data.csv') # Read post data from CSV file
+    for post in posts_data:
+        DBInteract.insert_post(connection, post) # Insert each post into the database
+    result = DBInteract.fetch_all_posts(connection) # Fetch all posts from the database
+    print("All posts in the database:")
     for row in result:
         print(row)
-        
+    
 if __name__ == "__main__": 
     main()
