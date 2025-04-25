@@ -1,15 +1,11 @@
 project_name,project_manager,institute,start_date,end_date
-proja,John Doe,Institute A,2023-01-01,2023-12-31
-projb,Jane Smith,Institute B,2023-02-01,2023-11-30
-projc,Jim Brown,Institute C,2023-03-01,2023-10-31
-projd,Emily Davis,Institute D,2023-04-01,2023-09-30
-proje,Chris Evans,Institute E,2023-05-01,2023-08-31
-projf,Michael Wilson,Institute E,2023-05-01,2023-08-31
-projg,Sarah Johnson,Institute F,2023-06-01,2023-07-31
-projh,Alice White,Institute G,2024-12-01,2024-11-30
-projo,Tom Green,Institute M,2024-01-01,2024-12-31
-projp,Bob Harris,Institute M,2024-01-01,2024-12-31
-projq,Charlie Clark,Institute N,2024-02-01,2024-11-30
-projr,Diana Lewis,Institute O,2024-03-01,2024-10-31
-projs,Frank Walker,Institute P,2024-04-01,2024-09-30
-projt,Gina Hall,Institute Q,2024-05-01,2024-08-31
+proj1,John Doe,Institute A,1/1/2023,12/31/2023
+proj2,Jane Smith,Institute B,2/1/2023,11/30/2023
+proj3,Jim Brown,Institute C,3/1/2023,10/31/2023
+proj4,Emily Davis,Institute D,4/1/2023,9/30/2023
+proj5,Chris Evans,Institute E,5/1/2023,8/31/2023
+proj6,Michael Wilson,Institute E,5/1/2023,8/31/2023
+proj7,Sarah Johnson,Institute F,6/1/2023,7/31/2023
+proj8,Alice White,Institute G,12/1/2024,11/30/2024
+proj9,Tom Green,Institute M,1/1/2024,12/31/2024
+proj10,Bob Harris,Institute M,1/1/2024,12/31/2024
