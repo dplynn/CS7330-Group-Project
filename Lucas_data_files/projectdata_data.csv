@@ -1,0 +1,11 @@
+project_name,post_username,post_social_media,post_time_posted,field,result
+proj1,user1,sm1,2023-10-01 12:00:00,field1,result1
+proj2,user2,sm2,2023-10-02 13:00:00,field2,
+proj3,user3,sm3,2023-10-03 14:00:00,field3,result3
+proj3,user4,sm4,2023-10-04 15:00:00,field4,result4
+proj1,user5,sm5,2023-10-05 16:00:00,field5,
+proj1,user6,sm6,2023-10-06 17:00:00,field6,result6
+proj2,user7,sm7,2023-10-07 18:00:00,field7,
+proj8,user8,sm8,2023-10-08 19:00:00,field8,result8
+proj9,user9,sm9,2023-10-09 20:00:00,field9,result9
+proj10,user10,sm10,2023-10-10 21:00:00,field10,result10

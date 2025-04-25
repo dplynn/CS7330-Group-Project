@@ -65,8 +65,9 @@ def create_tables(connection): #Creates the tables in the database
             orig_social_media VARCHAR(40),
             orig_time_posted DATETIME,
             orig_text TEXT,
-            PRIMARY KEY (username, social_media, time_posted)
-          
+            PRIMARY KEY (username, social_media, time_posted),
+            FOREIGN KEY (username, social_media) REFERENCES user(username, social_media),
+            FOREIGN KEY (orig_user, orig_social_media) REFERENCES user(username, social_media)
         )
         """
         #  FOREIGN KEY (username, social_media) REFERENCES user(username, social_media), / Foreign Key to user table NYI
@@ -94,7 +95,9 @@ def create_tables(connection): #Creates the tables in the database
             post_time_posted DATETIME NOT NULL,
             field VARCHAR(40) NOT NULL,
             result VARCHAR(40),
-            PRIMARY KEY (project_name, post_username, post_social_media, post_time_posted)
+            PRIMARY KEY (project_name, post_username, post_social_media, post_time_posted),
+            FOREIGN KEY (project_name) REFERENCES Project(project_name),
+            FOREIGN KEY (post_username, post_social_media, post_time_posted) REFERENCES Post(username, social_media, time_posted)
         )
         """
         # FOREIGN KEY (post_username, post_social_media, post_time_posted) REFERENCES Post(username, social_media, time_posted), # Foreign Key to Post table. NYI

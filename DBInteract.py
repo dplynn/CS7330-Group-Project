@@ -160,6 +160,7 @@ def fetch_user(connection, username, social_media): # Fetch user data from the d
         cursor.execute(select_query, (username, social_media))
         result = cursor.fetchone()
     return result
+
 def fetch_post(connection, username, social_media, time_posted): # Fetch post data from the database
     with connection.cursor() as cursor:
         select_query = """
@@ -168,6 +169,7 @@ def fetch_post(connection, username, social_media, time_posted): # Fetch post da
         cursor.execute(select_query, (username, social_media, time_posted))
         result = cursor.fetchone()
     return result
+
 def fetch_project(connection, project_name): # Fetch a project from the database
     with connection.cursor() as cursor:
         select_query = """
@@ -176,6 +178,7 @@ def fetch_project(connection, project_name): # Fetch a project from the database
         cursor.execute(select_query, (project_name,))
         result = cursor.fetchone()
     return result
+
 def fetch_projectdata(connection, project_name, post_username, post_social_media, post_time_posted): # Fetch project data from the database
     with connection.cursor() as cursor:
         select_query = """
@@ -192,9 +195,8 @@ def fetch_all_users(connection): # Returns all users in the database
         """
         cursor.execute(select_query)
         result = cursor.fetchall()
-
-
     return result
+
 def fetch_all_posts(connection): # Returns all posts in the database
     result = []
     with connection.cursor() as cursor:
@@ -203,8 +205,8 @@ def fetch_all_posts(connection): # Returns all posts in the database
         """
         cursor.execute(select_query)
         result = cursor.fetchall()
-
     return result
+
 def fetch_all_projects(connection): # Returns all projects in the database
     with connection.cursor() as cursor:
         select_query = """
@@ -212,8 +214,8 @@ def fetch_all_projects(connection): # Returns all projects in the database
         """
         cursor.execute(select_query)
         result = cursor.fetchall()
-
     return result
+
 def fetch_all_projectdata(connection): # Returns all project data in the database
     with connection.cursor() as cursor:
         select_query = """
