@@ -283,7 +283,7 @@ def fetch_posts_experiment(connection, project_name): #not sure for this one if 
         FROM ProjectData
         WHERE project_name = %s;
         """
-        cursor.execute(select_query1, (project_name)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        cursor.execute(select_query1, (project_name,)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
         result1 = cursor.fetchall()
 
         select_query2 = """
@@ -292,6 +292,6 @@ def fetch_posts_experiment(connection, project_name): #not sure for this one if 
         WHERE project_name = %s
         GROUP BY field;
         """
-        cursor.execute(select_query2, (project_name)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        cursor.execute(select_query2, (project_name,)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
         result2 = cursor.fetchall()
     return result1, result2
