@@ -271,6 +271,39 @@ def fetch_posts_twonames(connection, first_name, last_name):
         result = cursor.fetchall()
     return result
 
+#Query for all 4 at once
+def fetch_posts_all4(connection, social_media, beginning_time, ending_time, username, first_name, last_name):
+    with connection.cursor() as cursor:
+        query = """
+        SELECT p.*
+        FROM Post p, user u
+        WHERE (p.username = u.username AND p.social_media = u.social_media)
+        """
+        params = []
+
+        if social_media:
+            query += " AND p.social_media = %s"
+            params.append(social_media)
+
+        if beginning_time and ending_time:
+            query += " AND p.time_posted BETWEEN %s AND %s"
+            params.extend([beginning_time, ending_time])
+
+        if username:
+            query += " AND p.username = %s"
+            params.append(username)
+
+        if first_name and last_name:
+            query += " AND u.first_name = %s AND u.last_name = %s"
+            params.extend([first_name, last_name])
+
+        query += " ORDER BY p.time_posted;"  # Optional: nice to sort by time
+
+        cursor.execute(query, params)
+        result = cursor.fetchall()
+
+    return result
+
 #Querying experiment: You should ask the user for the name of the experiment, and it should
 #return the list of posts that is associated with the experiment, and for each post, any results that
 #has been entered. Also you need to display for each field, the percentage of posts that contain a
