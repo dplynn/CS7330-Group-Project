@@ -275,3 +275,23 @@ def fetch_posts_twonames(connection, first_name, last_name):
 #return the list of posts that is associated with the experiment, and for each post, any results that
 #has been entered. Also you need to display for each field, the percentage of posts that contain a
 #value of that field.
+
+def fetch_posts_experiment(connection, project_name): #not sure for this one if we just need the primary key of the post, or the actual post text itself
+    with connection.cursor() as cursor:
+        select_query1 = """
+        SELECT *
+        FROM ProjectData
+        WHERE project_name = %s;
+        """
+        cursor.execute(select_query1, (project_name)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        result = cursor.fetchall()
+
+        select_query2 = """
+        SELECT field, ROUND((SUM(CASE WHEN result IS NOT NULL AND result != 'None' THEN 1 ELSE 0 END) * 100.0) / COUNT(*), 2) AS percentage_filled
+        FROM ProjectData
+        WHERE project_name = %s
+        GROUP BY field;
+        """
+        cursor.execute(select_query2, (project_name)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        result = cursor.fetchall()
+    return result
