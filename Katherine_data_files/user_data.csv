@@ -1,0 +1,11 @@
+username,social_media,first_name,last_name,country_birth,country_residence,age,gender,verified
+dplynn,twitter,Davis,Lynn,USA,USA,35,male,1
+dplynn,facebook,Davis,Lynn,USA,USA,35,male,1
+dplynn,tiktok,Davis,Lynn,Italy,USA,35,male,1
+dplynn,twitter,Davis,Lynn,USA,USA,35,male,1
+dplynn,instagram,Davis,Lynn,Italy,USA,35,male,one
+bdavis,facebook,Bonita,Davis,USA,USA,28,female,0
+bdavis,tiktok,Bonita,Davis,USA,USA,28,female,FALSE
+kwirskye,facebook,Katherine,Wirskye,USA,USA,22,female,1
+kwirskye,tiktok,Katherine,Wirskye,USA,USA,22,female,0
+lli,facebook,Lucas,Li,USA,USA,30,male,1

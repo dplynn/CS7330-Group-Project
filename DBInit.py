@@ -23,7 +23,7 @@ def connect_to_database(): #Connect to the database using pymysql
             password=password,
             database=database
         )
-        print("Connection to the database was successful.")
+        print("Connection to the database was successful.\n")
         return connection
     except pymysql.MySQLError as e:
         print(f"Error connecting to the database: {e}")

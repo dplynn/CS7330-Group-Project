@@ -1,7 +1,7 @@
 import pymysql
 import csv
 import pandas as pd
-import datetime
+from datetime import datetime
 
 # SHOULD PROBABLY ADD A TRY CATCH BLOCK FOR EVERY SQL FUNCTION JUST TO BE SAFE
 
@@ -36,6 +36,7 @@ def insert_user(connection, user_data): # Insert user data into the database
         """
         cursor.execute(insert_query, user_data)
     connection.commit()   
+
 def insert_post(connection, post_data): # Insert post data into the database
     #username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted,orig_text
     post_data = list(post_data) if isinstance(post_data, tuple) else post_data
@@ -51,7 +52,7 @@ def insert_post(connection, post_data): # Insert post data into the database
         # print types for debugging
         print(f"Username type: {type(post_data[0])}, Social media type: {type(post_data[1])}")
         return
-    if not isinstance(post_data[2], datetime.datetime):
+    if not isinstance(post_data[2], datetime):
         print("Invalid post data. Time posted should be a datetime object.")
         return
     if not isinstance(post_data[3], str):
@@ -77,7 +78,7 @@ def insert_post(connection, post_data): # Insert post data into the database
         #types for debugging
         print(f"Original user type: {type(post_data[11])}, Original social media type: {type(post_data[12])}, Original text type: {type(post_data[14])}")
         return
-    if not isinstance(post_data[13], datetime.datetime):
+    if not isinstance(post_data[13], datetime):
         print("Invalid post data. Original time posted should be a datetime object.")
         return
     #convert orig_user, orig_social_media, orig_time_posted, orig_text to null if is_repost is False
@@ -93,6 +94,7 @@ def insert_post(connection, post_data): # Insert post data into the database
         """
         cursor.execute(insert_query, post_data)
     connection.commit()
+
 def insert_project(connection, project_data): # Insert projects into the database
     #project_name, project_manager, institute, start_date, end_date
     #check if project exists
@@ -109,7 +111,7 @@ def insert_project(connection, project_data): # Insert projects into the databas
     if not isinstance(project_data[2], str):
         print("Invalid project data. Institute should be a string.")
         return
-    if not isinstance(project_data[3], datetime.datetime) or not isinstance(project_data[4], datetime.datetime):
+    if not isinstance(project_data[3], datetime) or not isinstance(project_data[4], datetime):
         print("Invalid project data. Start date and end date should be datetime objects.")
         return
     if project_data[3] > project_data[4]:
@@ -124,6 +126,7 @@ def insert_project(connection, project_data): # Insert projects into the databas
         """
         cursor.execute(insert_query, project_data)
     connection.commit()
+
 def insert_projectdata(connection, project_data): # Insert project data into the database
     #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
     #check if projectdata exists
@@ -140,7 +143,7 @@ def insert_projectdata(connection, project_data): # Insert project data into the
     if not isinstance(project_data[2], str):
         print("Invalid project data. Post social media should be a string.")
         return
-    if not isinstance(project_data[3], datetime.datetime):
+    if not isinstance(project_data[3], datetime):
         print("Invalid project data. Post time posted should be a datetime object.")
         return
     if not isinstance(project_data[4], str):
@@ -240,11 +243,16 @@ def fetch_posts_socialmedia(connection, social_media):
 
 #Find posts between a certain period of time
 def fetch_posts_betweentime(connection, beginning_time, ending_time):
+    
+    beginning_date_time = datetime.strptime(beginning_time, "%m/%d/%Y %H:%M")
+    ending_date_time = datetime.strptime(ending_time, "%m/%d/%Y %H:%M")
+    
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM Post WHERE time_posted > %s AND time_posted < %s;
+        SELECT * FROM Post WHERE time_posted > %s AND time_posted < %s
+        ORDER BY time_posted ASC;
         """
-        cursor.execute(select_query, (beginning_time, ending_time)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        cursor.execute(select_query, (beginning_date_time, ending_date_time)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
         result = cursor.fetchall()
     return result
 
