@@ -284,7 +284,7 @@ def fetch_posts_experiment(connection, project_name): #not sure for this one if 
         WHERE project_name = %s;
         """
         cursor.execute(select_query1, (project_name)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
-        result = cursor.fetchall()
+        result1 = cursor.fetchall()
 
         select_query2 = """
         SELECT field, ROUND((SUM(CASE WHEN result IS NOT NULL AND result != 'None' THEN 1 ELSE 0 END) * 100.0) / COUNT(*), 2) AS percentage_filled
@@ -293,5 +293,5 @@ def fetch_posts_experiment(connection, project_name): #not sure for this one if 
         GROUP BY field;
         """
         cursor.execute(select_query2, (project_name)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
-        result = cursor.fetchall()
-    return result
+        result2 = cursor.fetchall()
+    return result1, result2
