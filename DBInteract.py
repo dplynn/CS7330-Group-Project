@@ -96,14 +96,14 @@ def insert_post(connection, post_data): # Insert post data into the database
     connection.commit()
 
 def insert_project(connection, project_data): # Insert projects into the database
-    #project_name, project_manager, institute, start_date, end_date
+    #project_name, project_manager, institute, field_names, start_date, end_date
     #check if project exists
     if fetch_project(connection, project_data[0]) is not None:
         print("Project already exists in the database.")
         return
     #check if project_data is valid
-    if len(project_data) != 5:
-        print("Invalid project data. Expected 5 fields.")
+    if len(project_data) != 6:
+        print("Invalid project data. Expected 6 fields.")
         return
     if not isinstance(project_data[0], str) or not isinstance(project_data[1], str):
         print("Invalid project data. Project name and project manager should be strings.")
@@ -111,18 +111,21 @@ def insert_project(connection, project_data): # Insert projects into the databas
     if not isinstance(project_data[2], str):
         print("Invalid project data. Institute should be a string.")
         return
-    if not isinstance(project_data[3], datetime) or not isinstance(project_data[4], datetime):
+    if not isinstance(project_data[3], str):
+        print("Invalid project data. Field names should be a string.")
+        return
+    if not isinstance(project_data[4], datetime) or not isinstance(project_data[5], datetime):
         print("Invalid project data. Start date and end date should be datetime objects.")
         return
-    if project_data[3] > project_data[4]:
+    if project_data[4] > project_data[5]:
         print("Invalid project data. Start date should be before end date.")
-        print(f"Start date: {project_data[3]}, End date: {project_data[4]}")
+        print(f"Start date: {project_data[4]}, End date: {project_data[5]}")
         return
     
     with connection.cursor() as cursor:
         insert_query = """
-        INSERT INTO Project (project_name, project_manager, institute, start_date, end_date)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO Project (project_name, project_manager, institute, field_names, start_date, end_date)
+        VALUES (%s, %s, %s, %s,%s, %s)
         """
         cursor.execute(insert_query, project_data)
     connection.commit()
@@ -156,6 +159,53 @@ def insert_projectdata(connection, project_data): # Insert project data into the
         """
         cursor.execute(insert_query, project_data)
     connection.commit()
+
+# KATHERINE
+def insert_post_no_data(connection, post_data): 
+    #Labels: 'project_name', 'post_username', 'post_social_media', 'post_time_posted'
+
+    #check if projectdata exists
+    #if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None:
+     #   print("ProjectData already exists in the database.")
+      #  return
+    
+    #check if project_data is valid
+    if len(post_data) != 4:
+        print("Invalid project data. Expected 4 fields.")
+        return
+    if not isinstance(post_data[0], str) or not isinstance(post_data[1], str):
+        print("Invalid project data. Project name and post username should be strings.")
+        return
+    if not isinstance(post_data[2], str):
+        print("Invalid project data. Post social media should be a string.")
+        return
+    if not isinstance(post_data[3], datetime):
+        print("Invalid project data. Post time posted should be a datetime object.")
+        return
+    
+    with connection.cursor() as cursor:
+        find_proj_fields_query = """
+        SELECT field_names 
+        FROM Project
+        WHERE project_name = %s
+        """
+        cursor.execute (find_proj_fields_query,post_data[0])
+        field_list = cursor.fetchone()
+
+    if len(field_list) == 0:
+        print("This post is not associated with a project that contains fields")
+        return
+    
+    ### ADD CODE TO PARSE THE CSV :)
+    
+    for field in field_list:
+        with connection.cursor() as cursor:
+            insert_query = """
+            INSERT INTO ProjectData (project_name, post_username, post_social_media, post_time_posted, field)
+            VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, tuple(post_data) + (field,))
+        connection.commit()
 
 def fetch_user(connection, username, social_media): # Fetch user data from the database
     with connection.cursor() as cursor:

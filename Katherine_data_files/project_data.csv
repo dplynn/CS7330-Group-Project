@@ -1,11 +1,11 @@
-project_name,project_manager,institute,start_date,end_date
-proj1,John Doe,Institute A,1/1/2023,12/31/2023
-proj2,Jane Smith,Institute B,2/1/2023,11/30/2023
-proj3,Jim Brown,Institute C,3/1/2023,10/31/2023
-proj4,Emily Davis,Institute D,4/1/2023,9/30/2023
-proj5,Chris Evans,Institute E,5/1/2023,8/31/2023
-proj6,Michael Wilson,Institute E,5/1/2023,8/31/2023
-proj7,Sarah Johnson,Institute F,6/1/2023,7/31/2023
-proj8,Alice White,Institute G,11/30/2024,12/1/2024
-proj9,Tom Green,Institute M,1/1/2024,12/31/2024
-proj10,Bob Harris,Institute M,1/1/2024,12/31/2024
+project_name,project_manager,institute,field_names,start_date,end_date
+proj1,John Doe,Institute A,"field1,field5,field6",1/1/2023,12/31/2023
+proj2,Jane Smith,Institute B,"field2,field7",2/1/2023,11/30/2023
+proj3,Jim Brown,Institute C,"field3,field4",3/1/2023,10/31/2023
+proj4,Emily Davis,Institute D,"field1",4/1/2023,9/30/2023
+proj5,Chris Evans,Institute E,"field1",5/1/2023,8/31/2023
+proj6,Michael Wilson,Institute E,"field1",5/1/2023,8/31/2023
+proj7,Sarah Johnson,Institute F,"field1",6/1/2023,7/31/2023
+proj8,Alice White,Institute G,"field1",11/30/2024,12/1/2024
+proj9,Tom Green,Institute M,"field8,field9",1/1/2024,12/31/2024
+proj10,Bob Harris,Institute M,"field10",1/1/2024,12/31/2024
