@@ -3,6 +3,8 @@ import csv
 import pandas as pd
 import datetime
 
+# SHOULD PROBABLY ADD A TRY CATCH BLOCK FOR EVERY SQL FUNCTION JUST TO BE SAFE
+
 def insert_user(connection, user_data): # Insert user data into the database
     #check if user exists
     if fetch_user(connection, user_data[0], user_data[1]) is not None:
@@ -155,7 +157,7 @@ def insert_projectdata(connection, project_data): # Insert project data into the
 def fetch_user(connection, username, social_media): # Fetch user data from the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM user WHERE username = %s AND social_media = %s
+        SELECT * FROM user WHERE username = %s AND social_media = %s;
         """
         cursor.execute(select_query, (username, social_media))
         result = cursor.fetchone()
@@ -164,7 +166,7 @@ def fetch_user(connection, username, social_media): # Fetch user data from the d
 def fetch_post(connection, username, social_media, time_posted): # Fetch post data from the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM Post WHERE username = %s AND social_media = %s AND time_posted = %s
+        SELECT * FROM Post WHERE username = %s AND social_media = %s AND time_posted = %s;
         """
         cursor.execute(select_query, (username, social_media, time_posted))
         result = cursor.fetchone()
@@ -173,7 +175,7 @@ def fetch_post(connection, username, social_media, time_posted): # Fetch post da
 def fetch_project(connection, project_name): # Fetch a project from the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM Project WHERE project_name = %s
+        SELECT * FROM Project WHERE project_name = %s;
         """
         cursor.execute(select_query, (project_name,))
         result = cursor.fetchone()
@@ -182,7 +184,7 @@ def fetch_project(connection, project_name): # Fetch a project from the database
 def fetch_projectdata(connection, project_name, post_username, post_social_media, post_time_posted): # Fetch project data from the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM ProjectData WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s
+        SELECT * FROM ProjectData WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s;
         """
         cursor.execute(select_query, (project_name, post_username, post_social_media, post_time_posted))
         result = cursor.fetchone()
@@ -191,7 +193,7 @@ def fetch_projectdata(connection, project_name, post_username, post_social_media
 def fetch_all_users(connection): # Returns all users in the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM user
+        SELECT * FROM user;
         """
         cursor.execute(select_query)
         result = cursor.fetchall()
@@ -201,7 +203,7 @@ def fetch_all_posts(connection): # Returns all posts in the database
     result = []
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM Post
+        SELECT * FROM Post;
         """
         cursor.execute(select_query)
         result = cursor.fetchall()
@@ -210,7 +212,7 @@ def fetch_all_posts(connection): # Returns all posts in the database
 def fetch_all_projects(connection): # Returns all projects in the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM Project
+        SELECT * FROM Project;
         """
         cursor.execute(select_query)
         result = cursor.fetchall()
@@ -219,8 +221,57 @@ def fetch_all_projects(connection): # Returns all projects in the database
 def fetch_all_projectdata(connection): # Returns all project data in the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM ProjectData
+        SELECT * FROM ProjectData;
         """
         cursor.execute(select_query)
         result = cursor.fetchall()
     return result
+
+#functions for the queries described in the project description pdf
+#find posts of a social media type
+def fetch_posts_socialmedia(connection, social_media):
+    with connection.cursor() as cursor:
+        select_query = """
+        SELECT * FROM Post WHERE social_media = %s;
+        """
+        cursor.execute(select_query, (social_media,))
+        result = cursor.fetchall()
+    return result
+
+#Find posts between a certain period of time
+def fetch_posts_betweentime(connection, beginning_time, ending_time):
+    with connection.cursor() as cursor:
+        select_query = """
+        SELECT * FROM Post WHERE time_posted > %s AND time_posted < %s;
+        """
+        cursor.execute(select_query, (beginning_time, ending_time)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        result = cursor.fetchall()
+    return result
+
+#Find posts that is posted by a certain username of a certain media
+def fetch_posts_user(connection, user, social_media):
+    with connection.cursor() as cursor:
+        select_query = """
+        SELECT * FROM Post WHERE username = %s AND social_media = %s;
+        """
+        cursor.execute(select_query, (user, social_media))
+        result = cursor.fetchall()
+    return result
+
+#Find posts that is posted by someone with a certain first/last name
+def fetch_posts_twonames(connection, first_name, last_name):
+    with connection.cursor() as cursor:
+        select_query = """
+        SELECT *
+        FROM Post p, user u
+        WHERE (p.username = u.username AND p.social_media = u.social_media)
+        AND (u.first_name = %s AND u.last_name = %s);
+        """
+        cursor.execute(select_query, (first_name, last_name)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        result = cursor.fetchall()
+    return result
+
+#Querying experiment: You should ask the user for the name of the experiment, and it should
+#return the list of posts that is associated with the experiment, and for each post, any results that
+#has been entered. Also you need to display for each field, the percentage of posts that contain a
+#value of that field.

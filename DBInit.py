@@ -200,7 +200,7 @@ def read_project_data(file_path): #Reads the project data from a CSV file and re
     df['start_date'] = pd.to_datetime(df['start_date'], errors='coerce')
     df['end_date'] = pd.to_datetime(df['end_date'], errors='coerce')
     # Remove rows with invalid datetime values
-    df = df.dropna(subset=['start_date', 'end_date'])
+    df = df.dropna(subset=['start_date', 'end_date']) #DOES THIS CHECK IF THE END DATE IS AFTER THE START DATE?
     # Convert the DataFrame to a list of tuples
     project_data = [tuple(row) for row in df.values]
     return project_data
@@ -209,7 +209,12 @@ def read_projectdata_data(file_path): #Reads the project data from a CSV file an
     #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
     df = pd.read_csv(file_path, skiprows=1, header=None, names=['project_name', 'post_username', 'post_social_media', 'post_time_posted', 'field', 'result'])
     # Convert the 'post_time_posted' column to datetime
+
+
+    #THIS IS VERY SPECIFIC, NOT SURE IF WE SHOULD LEAVE IT LIKE THIS? IF WE DO IT THIS SPECIIFC HERE, SHOULD WE DO THAT FOR OTHER TABLES AS WELL?
     df['post_time_posted'] = pd.to_datetime(df['post_time_posted'], format='%Y-%m-%d %H:%M:%S', errors='coerce')    # Remove rows with invalid datetime values
+    
+    
     df = df.dropna(subset=['post_time_posted'])
     #If result does not exist, set it to None
     df['result'] = df['result'].fillna('None')
