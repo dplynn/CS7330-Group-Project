@@ -35,13 +35,13 @@ def create_tables(connection): #Creates the tables in the database
         CREATE TABLE IF NOT EXISTS user (
             username VARCHAR(40) NOT NULL,
             social_media VARCHAR(40) NOT NULL,
-            first_name VARCHAR(40) NOT NULL,
-            last_name VARCHAR(40) NOT NULL,
-            country_birth VARCHAR(40) NOT NULL,
-            country_residence VARCHAR(40) NOT NULL,
-            age INT NOT NULL,
-            gender VARCHAR(10) NOT NULL,
-            verified BOOLEAN NOT NULL,
+            first_name VARCHAR(40),
+            last_name VARCHAR(40),
+            country_birth VARCHAR(40),
+            country_residence VARCHAR(40),
+            age INT,
+            gender VARCHAR(10),
+            verified BOOLEAN,
             PRIMARY KEY (username, social_media)
         )
         """
@@ -53,14 +53,14 @@ def create_tables(connection): #Creates the tables in the database
             username VARCHAR(40) NOT NULL,
             social_media VARCHAR(40) NOT NULL,
             time_posted DATETIME NOT NULL,
-            text TEXT NOT NULL,
-            city VARCHAR(40) NOT NULL,
-            state VARCHAR(40) NOT NULL,
-            country VARCHAR(40) NOT NULL,
-            num_likes INT NOT NULL,
-            num_dislikes INT NOT NULL,
-            multimedia BOOLEAN NOT NULL,
-            is_repost BOOLEAN NOT NULL,
+            text TEXT,
+            city VARCHAR(40),
+            state VARCHAR(40),
+            country VARCHAR(40),
+            num_likes INT,
+            num_dislikes INT,
+            multimedia BOOLEAN,
+            is_repost BOOLEAN,
             orig_user VARCHAR(40),
             orig_social_media VARCHAR(40),
             orig_time_posted DATETIME,
@@ -78,10 +78,11 @@ def create_tables(connection): #Creates the tables in the database
         create_table_query = """
         CREATE TABLE IF NOT EXISTS Project (
             project_name VARCHAR(40) NOT NULL PRIMARY KEY,
-            project_manager VARCHAR(40) NOT NULL,
-            institute VARCHAR(40) NOT NULL,
-            start_date DATETIME NOT NULL,
-            end_date DATETIME NOT NULL
+            project_manager VARCHAR(40),
+            institute VARCHAR(40),
+            field_names LONGTEXT,
+            start_date DATETIME,
+            end_date DATETIME
         )
         """
         cursor.execute(create_table_query)
@@ -93,8 +94,8 @@ def create_tables(connection): #Creates the tables in the database
             post_username VARCHAR(40) NOT NULL,
             post_social_media VARCHAR(40) NOT NULL,
             post_time_posted DATETIME NOT NULL,
-            field VARCHAR(40) NOT NULL,
-            result VARCHAR(40),
+            fields LONGTEXT,
+            result LONGTEXT,
             PRIMARY KEY (project_name, post_username, post_social_media, post_time_posted),
             FOREIGN KEY (project_name) REFERENCES Project(project_name),
             FOREIGN KEY (post_username, post_social_media, post_time_posted) REFERENCES Post(username, social_media, time_posted)
@@ -107,23 +108,41 @@ def create_tables(connection): #Creates the tables in the database
 def clear_tables(connection): #Clears the tables in the database
     with connection.cursor() as cursor:
         # Clear the ProjectData table
-        clear_query = "DELETE FROM ProjectData"
+        clear_query = "CLEAR TABLE ProjectData"
         cursor.execute(clear_query)
 
         # Clear the Post table
-        clear_query = "DELETE FROM Post"
+        clear_query = "CLEAR TABLE Post"
         cursor.execute(clear_query)
 
         # Clear the Project table
-        clear_query = "DELETE FROM Project"
+        clear_query = "CLEAR TABLE Project"
         cursor.execute(clear_query)
 
         # Clear the User table
-        clear_query = "DELETE FROM user"
+        clear_query = "CLEAR TABLE user"
         cursor.execute(clear_query)
 
     connection.commit()
+def drop_tables(connection): #Deletes the tables in the database
+    with connection.cursor() as cursor:
+        # Clear the ProjectData table
+        clear_query = "DROP TABLE IF EXISTS ProjectData"
+        cursor.execute(clear_query)
 
+        # Clear the Post table
+        clear_query = "DROP TABLE IF EXISTS Post"
+        cursor.execute(clear_query)
+
+        # Clear the Project table
+        clear_query = "DROP TABLE IF EXISTS Project"
+        cursor.execute(clear_query)
+
+        # Clear the User table
+        clear_query = "DROP TABLE IF EXISTS user"
+        cursor.execute(clear_query)
+
+    connection.commit()
 def read_user_data(file_path): #Reads the user data from a CSV file and returns it as a list of tuples, for testing ONLY
     # Labels: username,social_media,first_name,last_name,country_birth,country_residence,age
     # Read the CSV file into a DataFrame
@@ -195,7 +214,7 @@ def read_post_data(file_path): #Reads the post data from a CSV file and returns 
 
 def read_project_data(file_path): #Reads the project data from a CSV file and returns it as a list of tuples, for testing ONLY
     #Labels: project_name,project_manager,institute,start_date,end_date
-    df = pd.read_csv(file_path, skiprows=1, header=None, names=['project_name', 'project_manager', 'institute', 'start_date', 'end_date'])
+    df = pd.read_csv(file_path, skiprows=1, header=None, names=['project_name', 'project_manager', 'field_names' 'institute', 'start_date', 'end_date'])
     # Convert the 'start_date' and 'end_date' columns to datetime
     df['start_date'] = pd.to_datetime(df['start_date'], errors='coerce')
     df['end_date'] = pd.to_datetime(df['end_date'], errors='coerce')

@@ -8,8 +8,8 @@ import testing
 
 def main():
     connection = DBInit.connect_to_database() # Connect to the database using pymysql
+    DBInit.drop_tables(connection) # Drop existing tables in the database
     DBInit.create_tables(connection) # Create tables in the database
-    DBInit.clear_tables(connection) # Clear tables in the database
 
     name = input("Whose test files are we running? Davis, Lucas, or Katherine? ")
     print("\n")
