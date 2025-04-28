@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Database Manager</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <h1>Database Manager</h1>
+
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('about') }}">Enter Data</a></li>
+                <li><a href="{{ url_for('contact') }}">Query Posts</a></li>
+                <li><a href="{{ url_for('contact') }}">Query Projects</a></li>
+            </ul>
+        </nav>
+
+        <form>
+            <label for="project_name">Project Name:</label>
+            <input type="text" name="project_name"><br>
+            <label for="manager">Project Manager:</label>
+            <input type="text" name="manager"><br>
+            <label for="institute">Institute:</label>
+            <input type="text" name="institute"><br>
+            <label for="start">Start Date:</label>
+            <input type="date" name="start"><br>
+            <label for="end">End Date:</label>
+            <input type="date" name="end"><br>
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
