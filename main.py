@@ -55,11 +55,6 @@ def main():
     projectdata_data = DBInit.read_projectdata_data(name+'_data_files/projectdata_data.csv') # Read project data from CSV file
     for projectdata in projectdata_data:
         DBInteract.insert_field_values(connection, projectdata) # Insert each project into the database
-    
-    
-    #result = DBInteract.fetch_all_projectdata(connection) # Fetch all project data from the database
-    #print(f"Number of project data in the database: {len(result)}")
-
 
     # OLD METHOD FOR DATA ENTRY
     
@@ -70,7 +65,7 @@ def main():
     #print(f"Number of project data in the database: {len(result)}")
 
     # UNCOMMENT TO RUN TESTING
-    # testing.testing(connection)
+    testing.testing(connection)
 
 if __name__ == "__main__": 
     main()
