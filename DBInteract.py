@@ -2,6 +2,8 @@ import pymysql
 import csv
 import pandas as pd
 from datetime import datetime
+import csv
+from io import StringIO
 
 # SHOULD PROBABLY ADD A TRY CATCH BLOCK FOR EVERY SQL FUNCTION JUST TO BE SAFE
 
@@ -133,7 +135,7 @@ def insert_project(connection, project_data): # Insert projects into the databas
 def insert_projectdata(connection, project_data): # Insert project data into the database
     #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
     #check if projectdata exists
-    if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None:
+    if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None: #I THINK CHANGE TO INCLUDE project_data[4] since field is now part of the primary key
         print("ProjectData already exists in the database.")
         return
     #check if project_data is valid
@@ -152,6 +154,9 @@ def insert_projectdata(connection, project_data): # Insert project data into the
     if not isinstance(project_data[4], str):
         print("Invalid project data. Field should be a string.")
         return
+    if not isinstance(project_data[5], str): #ADDED THIS
+        print("Invalid project data. Result should be a string.")
+        return
     with connection.cursor() as cursor:
         insert_query = """
         INSERT INTO ProjectData (project_name, post_username, post_social_media, post_time_posted, field, result)
@@ -163,11 +168,6 @@ def insert_projectdata(connection, project_data): # Insert project data into the
 # KATHERINE
 def insert_post_no_data(connection, post_data): 
     #Labels: 'project_name', 'post_username', 'post_social_media', 'post_time_posted'
-
-    #check if projectdata exists
-    #if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None:
-     #   print("ProjectData already exists in the database.")
-      #  return
     
     #check if project_data is valid
     if len(post_data) != 4:
@@ -183,6 +183,16 @@ def insert_post_no_data(connection, post_data):
         print("Invalid project data. Post time posted should be a datetime object.")
         return
     
+    #check if project exists
+    if fetch_project(connection, post_data[0]) is None:
+        print("The project \"" + post_data[0] + "\" associated with this post doesn't exist in the database.")
+        return
+    
+    #check if post exists
+    if fetch_post(connection, post_data[1], post_data[2], post_data[3]) is None:
+        print("Post does not yet exist in the database.")
+        return
+    
     with connection.cursor() as cursor:
         find_proj_fields_query = """
         SELECT field_names 
@@ -190,14 +200,16 @@ def insert_post_no_data(connection, post_data):
         WHERE project_name = %s
         """
         cursor.execute (find_proj_fields_query,post_data[0])
-        field_list = cursor.fetchone()
+        field_names = cursor.fetchone()
 
-    if len(field_list) == 0:
-        print("This post is not associated with a project that contains fields")
+    if len(field_names) == 0:
+        print("This post is not associated with a project that contains fields. Project \"" + post_data[0] + "\" has no fields.")
         return
     
-    ### ADD CODE TO PARSE THE CSV :)
-    
+    f = StringIO(field_names[0])
+    reader = csv.reader(f)
+    field_list = next(reader)  
+
     for field in field_list:
         with connection.cursor() as cursor:
             insert_query = """
@@ -206,6 +218,45 @@ def insert_post_no_data(connection, post_data):
             """
             cursor.execute(insert_query, tuple(post_data) + (field,))
         connection.commit()
+
+# KATHERINE
+        
+def insert_field_values(connection, project_data):
+    #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
+    
+    #check if the correct spot for data entry exists
+    if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]) is None:
+        print("The project/post/field combo you are trying to insert data for is incorrect: " + project_data)
+        return
+    
+    #check if project_data is valid
+    if len(project_data) != 6:
+        print("Invalid project data. Expected 6 fields.")
+        return
+    if not isinstance(project_data[0], str) or not isinstance(project_data[1], str):
+        print("Invalid project data. Project name and post username should be strings.")
+        return
+    if not isinstance(project_data[2], str):
+        print("Invalid project data. Post social media should be a string.")
+        return
+    if not isinstance(project_data[3], datetime):
+        print("Invalid project data. Post time posted should be a datetime object.")
+        return
+    if not isinstance(project_data[4], str):
+        print("Invalid project data. Field should be a string.")
+        return
+    if not isinstance(project_data[5], str):
+        print("Invalid project data. Result should be a string.")
+        return
+    
+    with connection.cursor() as cursor:
+        update_query = """
+        UPDATE ProjectData
+        SET result = %s
+        WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s AND field = %s;
+        """
+        cursor.execute(update_query, (project_data[5], project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]))
+    connection.commit()
 
 def fetch_user(connection, username, social_media): # Fetch user data from the database
     with connection.cursor() as cursor:
@@ -234,12 +285,12 @@ def fetch_project(connection, project_name): # Fetch a project from the database
         result = cursor.fetchone()
     return result
 
-def fetch_projectdata(connection, project_name, post_username, post_social_media, post_time_posted): # Fetch project data from the database
+def fetch_projectdata(connection, project_name, post_username, post_social_media, post_time_posted, field): # Fetch project data from the database
     with connection.cursor() as cursor:
         select_query = """
-        SELECT * FROM ProjectData WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s;
+        SELECT * FROM ProjectData WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s AND field = %s;
         """
-        cursor.execute(select_query, (project_name, post_username, post_social_media, post_time_posted))
+        cursor.execute(select_query, (project_name, post_username, post_social_media, post_time_posted, field))
         result = cursor.fetchone()
     return result
 

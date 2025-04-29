@@ -46,9 +46,22 @@ def main():
 
     associated_posts = DBInit.read_associated_posts(name+'_data_files/associated_posts.csv') # Read post data from CSV file
     for post in associated_posts:
-        DBInteract.insert_post_no_data(connection, post) # Insert each post into the database
-    #result = DBInteract.fetch_all_projects(connection) # Fetch all projects from the database
-    #print(f"Number of projects in the database: {len(result)}")
+        DBInteract.insert_post_no_data(connection, post) # Insert each post/field combo for analysis into the database
+    result = DBInteract.fetch_all_projectdata(connection) # Fetch all tuples for project data from the database
+    print(f"Number of project/post/field combos ready for result entry in the database: {len(result)}")
+
+    # PART 6: ENTER VALUES FOR FIELDS
+    
+    projectdata_data = DBInit.read_projectdata_data(name+'_data_files/projectdata_data.csv') # Read project data from CSV file
+    for projectdata in projectdata_data:
+        DBInteract.insert_field_values(connection, projectdata) # Insert each project into the database
+    
+    
+    #result = DBInteract.fetch_all_projectdata(connection) # Fetch all project data from the database
+    #print(f"Number of project data in the database: {len(result)}")
+
+
+    # OLD METHOD FOR DATA ENTRY
     
     #projectdata_data = DBInit.read_projectdata_data(name+'_data_files/projectdata_data.csv') # Read project data from CSV file
     #for projectdata in projectdata_data:
