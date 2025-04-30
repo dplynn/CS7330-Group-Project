@@ -29,7 +29,7 @@ function renumberPosts() {
       const label = post.querySelector('label p');
       label.textContent = `Post ${index + 1}`;
     });
-  }
+}
 
 function removePost(button) {
     button.parentElement.remove();

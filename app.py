@@ -11,5 +11,9 @@ def index():
 def add_post():
     return render_template('add_post.html')
 
+@app.route('/add-project')
+def add_project():
+    return render_template('add_project.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
