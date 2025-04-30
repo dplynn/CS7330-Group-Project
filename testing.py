@@ -86,7 +86,7 @@ def test_individual_queries(connection):
             print(post)
 
     # test fetch posts within a time frame function
-        posts4 = DBInteract.fetch_posts_betweentime(connection, "10/5/2025 11:00", "10/6/2025 11:00")
+    posts4 = DBInteract.fetch_posts_betweentime(connection, "10/5/2025 11:00", "10/6/2025 11:00")
     print("\nTesting fetch_posts_between time:")
     if len(posts4) == 0:
         print("Posts from time range not found")
@@ -169,32 +169,102 @@ def test_all4_query(connection):
         print(str(len(result))+" posts found")
 
     print("\n2) Testing all 4 query (only time period)")
+    result = DBInteract.fetch_posts_all4(connection, None, datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),None,None,None)
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n3) Testing all 4 query (only username of a social media)")
+    result = DBInteract.fetch_posts_all4(connection, None, None,None,"dplynn",None,None)
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n4) Testing all 4 query (only first/last name)")
+    result = DBInteract.fetch_posts_all4(connection, None, None,None,None,"Katherine","Wirskye")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n5) Testing all 4 query (social media & time period)")
+    result = DBInteract.fetch_posts_all4(connection, "twitter", datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),None,None,None)
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n6)Testing all 4 query (social media & username of social media)")
+    result = DBInteract.fetch_posts_all4(connection, "tiktok", None,None,"dplynn",None,None)
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n7)Testing all 4 query (social media & first/last name)")
+    result = DBInteract.fetch_posts_all4(connection, "tiktok", None,None,None,"Davis","Lynn")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n8)Testing all 4 query (time period & username of social media)")
+    result = DBInteract.fetch_posts_all4(connection, None, datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),"kwirskye",None,None)
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n9)Testing all 4 query (time period & first/last name)")
+    result = DBInteract.fetch_posts_all4(connection, None, datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),None,"Katherine","Wirskye")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n10)Testing all 4 query (username & first/last name)")
+    result = DBInteract.fetch_posts_all4(connection, None, None,None,"BADUSERNAME","Katherine","Wirskye")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n11)Testing all 4 query (social media & time period & username)")
+    result = DBInteract.fetch_posts_all4(connection, "tiktok", datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),"kwirskye",None,None)
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n12) Testing all 4 query (social media & time period & first/last name)")
+    result = DBInteract.fetch_posts_all4(connection, "tiktok", datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),None,"Bonita","Davis")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n13)Testing all 4 query (social media & username & first/last name)")
+    result = DBInteract.fetch_posts_all4(connection, "tiktok", None,None,"bdavis","Bonita","Davis")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n14) Testing all 4 query (time period & username & first/last name)")
+    result = DBInteract.fetch_posts_all4(connection, None, datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),"bdavis","Bonita","Davis")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
     print("\n15) Testing all 4 query (ALL FOUR FIELDS)")
+    result = DBInteract.fetch_posts_all4(connection, "tiktok", datetime.strptime("2023-11-1 00:00:00", "%Y-%m-%d %H:%M:%S"),datetime.strptime("2023-11-5 00:00:00", "%Y-%m-%d %H:%M:%S"),"bdavis","Bonita","Davis")
+    if len(result) == 0:
+        print("No posts found")
+    else:
+        print(str(len(result))+" posts found")
 
 
 def testing(connection):
