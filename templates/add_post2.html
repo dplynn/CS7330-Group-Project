@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Post - Database Manager{% endblock %}
+
+{% block content %}
+
+<h2>Enter original post data</h2>
+<form method="POST">
+    <div id="posts-container">
+        <label for="orig_user">Username:</label> <input type="text" name="username[]" required><br>
+        <label for="orig_platform">Social Media Platform:</label> <input type="text" name="social_media[]" required><br>
+        <label for="orig_time">Time Posted:</label> <input type="datetime-local" name="time_posted[]" required><br>
+        <br><br>
+    </div>
+
+    <button type="button" onclick="addPost()">Add Another Post</button><br><br>
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}
