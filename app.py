@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import DBInit
 import DBInteract
-import pymysql
+from datetime import datetime
+import pandas as pd
 
 app = Flask(__name__)
 app.secret_key = 'bonita123'
@@ -41,9 +42,54 @@ def add_user():
 
     return render_template('add_user.html')
 
-@app.route('/add-post')
+@app.route('/add-post', methods=['GET', 'POST'])
 def add_post():
+    if request.method == 'POST':
+        print("Form data received:", request.form)
+
+        post = {
+            'username': request.form['username'],
+            'social_media': request.form['social_media'],
+            'time_posted': datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M'),
+            'text': request.form['text'],
+            'city': request.form['city'],
+            'state': request.form['state'],
+            'country': request.form['country'],
+            'num_likes': int(request.form['num_likes']),
+            'num_dislikes': int(request.form['num_dislikes']),
+            'multimedia': request.form['multimedia'] == 'yes',
+            'is_repost': request.form['is_repost'] == 'yes'
+        }
+
+        if request.form['is_repost'] == True:
+            session['repost_data'] = post
+            return redirect(url_for('add_post2'))
+        
+        post_list = list(post.values()) + [None, None, pd.NaT, None]
+        print(post_list)
+
+        connection = DBInit.connect_to_database()
+
+        try:
+            DBInteract.insert_post(connection, post_list)
+            connection.commit()
+            flash('Post added successfully!\n', 'success')
+        except Exception as e:
+            connection.rollback()
+            flash(f"Error: {e}", 'danger')
+        finally:
+            connection.close()
+        
+        return redirect(url_for('add_post'))
+
     return render_template('add_post.html')
+
+@app.route('/add-post-original', methods=['GET', 'POST'])
+def add_post2():
+    if request.method == 'POST':
+        flash("Repost handled and saved!", "success")
+        return redirect(url_for('add_post'))
+    return render_template('add_post2.html')
 
 @app.route('/add-project')
 def add_project():
