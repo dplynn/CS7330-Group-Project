@@ -4,6 +4,7 @@ import DBInteract
 import pymysql
 
 app = Flask(__name__)
+app.secret_key = 'bonita123'
 
 @app.route('/')
 def index():
@@ -11,30 +12,32 @@ def index():
 
 @app.route('/add-user', methods=['GET', 'POST'])
 def add_user():
-    # if request.method == 'POST':
-    #     user = {
-    #         'username': request.form['username'],
-    #         'social_media': request.form['social_media'],
-    #         'first_name': request.form['first_name'],
-    #         'last_name': request.form['last_name'],
-    #         'country_birth': request.form['country_birth'],
-    #         'country_residence': request.form['country_residence'],
-    #         'age': int(request.form['age']),
-    #         'gender': request.form['gender'],
-    #         'verified': request.form['verified'] == 'True'
-    #     }
+    if request.method == 'POST':
+        print("Form data received:", request.form)
 
-    #     connection = DBInit.connect_to_database()
-    #     try:
-    #         DBInteract.insert_user(connection, user)
-    #         connection.commit()
-    #         flash('User added successfully!', 'success')
-    #     except Exception as e:
-    #         connection.rollback()
-    #         flash(f"Error: {e}", 'danger')
-    #     finally:
-    #         connection.close()
-    #     return redirect(url_for('add_users'))
+        user = [
+            request.form['username'],
+            request.form['social_media'],
+            request.form['first_name'],
+            request.form['last_name'],
+            request.form['country_birth'],
+            request.form['country_residence'],
+            int(request.form['age']),
+            request.form['gender'],
+            request.form['verified'] == 'yes'  # Convert 'yes'/'no' to boolean
+        ]
+
+        connection = DBInit.connect_to_database()
+        try:
+            DBInteract.insert_user(connection, user)
+            connection.commit()
+            flash('User added successfully!\n', 'success')
+        except Exception as e:
+            connection.rollback()
+            flash(f"Error: {e}", 'danger')
+        finally:
+            connection.close()
+        return redirect(url_for('add_user'))
 
     return render_template('add_user.html')
 
@@ -60,10 +63,14 @@ def add_result2():
 
 if __name__ == '__main__':
     try:
-        connection = DBInit.connect_to_database()  # Connect to the database using pymysql
-        DBInit.drop_tables(connection)  # Drop existing tables in the database
-        DBInit.create_tables(connection)  # Create tables in the database
-        print("Database setup completed.\n")
+        connection = DBInit.connect_to_database()
+        if connection:
+            DBInit.drop_tables(connection)
+            DBInit.create_tables(connection)
+            print("Database setup completed.\n")
+            connection.close()
+        else:
+            print("Could not establish database connection.\n")
     except Exception as e:
         print(f"Error during database setup: {e}\n")
 

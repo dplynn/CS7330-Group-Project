@@ -1,2 +1,6 @@
 __pycache__
 DB_Info.csv
+
+# Ignore virtual environment folder
+.venv/
+venv/

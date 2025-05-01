@@ -117,6 +117,41 @@ button {
     margin-bottom: 5px;
 }
 
+.flash-messages .alert {
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.flash-messages .alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.flash-messages .alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.flash-messages .alert-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.flash-messages .alert-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+}
+
+.flash-messages .alert:hover {
+    opacity: 0.9;
+}
+
 /* responsive design for mobile devices */
 @media (max-width: 768px) {
     nav ul li {
