@@ -8,29 +8,25 @@ from io import StringIO
 # SHOULD PROBABLY ADD A TRY CATCH BLOCK FOR EVERY SQL FUNCTION JUST TO BE SAFE
 
 def insert_user(connection, user_data): # Insert user data into the database
-    #check if user exists
-    if fetch_user(connection, user_data[0], user_data[1]) is not None:
-        print("User already exists in the database.")
-        return
+
     #check if user_data is valid
     if len(user_data) != 9:
-        print("Invalid user data. Expected 9 fields.")
-        return
+        raise ValueError("Invalid user data. Expected 9 fields.")
     if not isinstance(user_data[0], str) or not isinstance(user_data[1], str):
-        print("Invalid user data. Username and social media should be strings.")
-        return
+        raise TypeError("Invalid user data. Username and social media should be strings.")
     if not isinstance(user_data[2], str) or not isinstance(user_data[3], str):
-        print("Invalid user data. First name and last name should be strings.")
-        return
+        raise TypeError("Invalid user data. First name and last name should be strings.")
     if not isinstance(user_data[4], str) or not isinstance(user_data[5], str):
-        print("Invalid user data. Country of birth and country of residence should be strings.")
-        return
+        raise TypeError("Invalid user data. Country of birth and country of residence should be strings.")
     if not isinstance(user_data[6], int):
-        print("Invalid user data. Age should be an integer.")
-        return
+        raise TypeError("Invalid user data. Age should be an integer.")
     if user_data[6] < 0:
-        print("Invalid user data. Age should be a positive integer.")
-        return
+        raise ValueError("Invalid user data. Age should be a positive integer.")
+    
+    #check if user exists
+    if fetch_user(connection, user_data[0], user_data[1]) is not None:
+        raise ValueError("User already exists in the database.")
+
     with connection.cursor() as cursor:
         insert_query = """
         INSERT INTO user (username,social_media,first_name,last_name,country_birth,country_residence,age,gender,verified)
@@ -41,54 +37,48 @@ def insert_user(connection, user_data): # Insert user data into the database
 
 def insert_post(connection, post_data): # Insert post data into the database
     #username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted,orig_text
+    
     post_data = list(post_data) if isinstance(post_data, tuple) else post_data
-    if fetch_post(connection, post_data[0], post_data[1], post_data[2]) is not None:
-        print("Post already exists in the database.")
-        return
+    
     #check if post_data is valid
     if len(post_data) != 15:
-        print("Invalid post data. Expected 15 fields.")
-        return
+        raise ValueError("Invalid post data. Expected 15 fields.")
     if not isinstance(post_data[0], str) or not isinstance(post_data[1], str):
-        print("Invalid post data. Username and social media should be strings.")
         # print types for debugging
         print(f"Username type: {type(post_data[0])}, Social media type: {type(post_data[1])}")
-        return
+        raise TypeError("Invalid post data. Username and social media should be strings.")
     if not isinstance(post_data[2], datetime):
-        print("Invalid post data. Time posted should be a datetime object.")
-        return
+        raise TypeError("Invalid post data. Time posted should be a datetime object.")
     if not isinstance(post_data[3], str):
-        print("Invalid post data. Text should be a string.")
-        return
+        raise TypeError("Invalid post data. Text should be a string.")
     if not isinstance(post_data[4], str) or not isinstance(post_data[5], str) or not isinstance(post_data[6], str):
-        print("Invalid post data. City, state, and country should be strings.")
-        return
+        raise TypeError("Invalid post data. City, state, and country should be strings.")
     if not isinstance(post_data[7], int) or not isinstance(post_data[8], int):
-        print("Invalid post data. Number of likes and dislikes should be integers.")
-        return
+        raise TypeError("Invalid post data. Number of likes and dislikes should be integers.")
     if post_data[7] < 0 or post_data[8] < 0:
-        print("Invalid post data. Number of likes and dislikes should be positive integers.")
-        return
+        raise ValueError("Invalid post data. Number of likes and dislikes should be positive integers.")
     if not isinstance(post_data[9], bool) or not isinstance(post_data[10], bool):
-        print("Invalid post data. Multimedia and is repost should be boolean values.")
-        return
+        raise TypeError("Invalid post data. Multimedia and is repost should be boolean values.")
     if post_data[10] and (post_data[11] is None or post_data[12] is None or post_data[14] is None):
-        print("Invalid post data. Original user, social media, time posted, and text should not be None if is repost is True.")
-        return
+        raise ValueError("Invalid post data. Original user, social media, time posted, and text should not be None if is repost is True.")
     if post_data[10] and (not isinstance(post_data[11], str) or not isinstance(post_data[12], str)):
-        print("Invalid post data. Original user, social media, and text should be strings.")
         #types for debugging
         print(f"Original user type: {type(post_data[11])}, Original social media type: {type(post_data[12])}, Original text type: {type(post_data[14])}")
-        return
+        raise TypeError("Invalid post data. Original user, social media, and text should be strings.")
     if not isinstance(post_data[13], datetime):
-        print("Invalid post data. Original time posted should be a datetime object.")
-        return
+        raise TypeError("Invalid post data. Original time posted should be a datetime object.")
+    
+    # check if posts already exists
+    if fetch_post(connection, post_data[0], post_data[1], post_data[2]) is not None:
+        raise ValueError("Post already exists in the database.")
+
     #convert orig_user, orig_social_media, orig_time_posted, orig_text to null if is_repost is False
     if not post_data[10]:
         post_data[11] = None
         post_data[12] = None
         post_data[13] = None
         post_data[14] = None
+
     with connection.cursor() as cursor:
         insert_query = """
         INSERT INTO Post (username, social_media, time_posted, text, city, state, country, num_likes, num_dislikes, multimedia, is_repost, orig_user, orig_social_media, orig_time_posted, orig_text)
@@ -99,30 +89,25 @@ def insert_post(connection, post_data): # Insert post data into the database
 
 def insert_project(connection, project_data): # Insert projects into the database
     #project_name, project_manager, institute, field_names, start_date, end_date
-    #check if project exists
-    if fetch_project(connection, project_data[0]) is not None:
-        print("Project already exists in the database.")
-        return
+    
     #check if project_data is valid
     if len(project_data) != 6:
-        print("Invalid project data. Expected 6 fields.")
-        return
+        raise ValueError("Invalid project data. Expected 6 fields.")
     if not isinstance(project_data[0], str) or not isinstance(project_data[1], str):
-        print("Invalid project data. Project name and project manager should be strings.")
-        return
+        raise TypeError("Invalid project data. Project name and project manager should be strings.")
     if not isinstance(project_data[2], str):
-        print("Invalid project data. Institute should be a string.")
-        return
+        raise TypeError("Invalid project data. Institute should be a string.")
     if not isinstance(project_data[3], str):
-        print("Invalid project data. Field names should be a string.")
-        return
+        raise TypeError("Invalid project data. Field names should be a string.")
     if not isinstance(project_data[4], datetime) or not isinstance(project_data[5], datetime):
-        print("Invalid project data. Start date and end date should be datetime objects.")
-        return
+        raise TypeError("Invalid project data. Start date and end date should be datetime objects.")
     if project_data[4] > project_data[5]:
-        print("Invalid project data. Start date should be before end date.")
         print(f"Start date: {project_data[4]}, End date: {project_data[5]}")
-        return
+        raise ValueError("Invalid project data. Start date should be before end date.")
+    
+    #check if project exists
+    if fetch_project(connection, project_data[0]) is not None:
+        raise ValueError("Project already exists in the database.")
     
     with connection.cursor() as cursor:
         insert_query = """
@@ -132,31 +117,28 @@ def insert_project(connection, project_data): # Insert projects into the databas
         cursor.execute(insert_query, project_data)
     connection.commit()
 
+# USED WITH OLD DATA ENTRY METHOD
 def insert_projectdata(connection, project_data): # Insert project data into the database
     #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
-    #check if projectdata exists
-    if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None: #I THINK CHANGE TO INCLUDE project_data[4] since field is now part of the primary key
-        print("ProjectData already exists in the database.")
-        return
+
     #check if project_data is valid
     if len(project_data) != 6:
-        print("Invalid project data. Expected 6 fields.")
-        return
+        raise ValueError("Invalid project data. Expected 6 fields.")
     if not isinstance(project_data[0], str) or not isinstance(project_data[1], str):
-        print("Invalid project data. Project name and post username should be strings.")
-        return
+        raise TypeError("Invalid project data. Project name and post username should be strings.")
     if not isinstance(project_data[2], str):
-        print("Invalid project data. Post social media should be a string.")
-        return
+        raise TypeError("Invalid project data. Post social media should be a string.")
     if not isinstance(project_data[3], datetime):
-        print("Invalid project data. Post time posted should be a datetime object.")
-        return
+        raise TypeError("Invalid project data. Post time posted should be a datetime object.")
     if not isinstance(project_data[4], str):
-        print("Invalid project data. Field should be a string.")
-        return
+        raise TypeError("Invalid project data. Field should be a string.")
     if not isinstance(project_data[5], str): #ADDED THIS
-        print("Invalid project data. Result should be a string.")
-        return
+        raise TypeError("Invalid project data. Result should be a string.")
+    
+    #check if projectdata exists
+    if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None: # CHANGED TO INCLUDE project_data[4] since field is now part of the primary key
+        raise ValueError("ProjectData already exists in the database.")
+    
     with connection.cursor() as cursor:
         insert_query = """
         INSERT INTO ProjectData (project_name, post_username, post_social_media, post_time_posted, field, result)
@@ -165,33 +147,27 @@ def insert_projectdata(connection, project_data): # Insert project data into the
         cursor.execute(insert_query, project_data)
     connection.commit()
 
-# KATHERINE
+# USED WITH NEW DATA ENTRY METHOD
 def insert_post_no_data(connection, post_data): 
     #Labels: 'project_name', 'post_username', 'post_social_media', 'post_time_posted'
     
     #check if project_data is valid
     if len(post_data) != 4:
-        print("Invalid project data. Expected 4 fields.")
-        return
+        raise ValueError("Invalid project data. Expected 4 fields.")
     if not isinstance(post_data[0], str) or not isinstance(post_data[1], str):
-        print("Invalid project data. Project name and post username should be strings.")
-        return
+        raise TypeError("Invalid project data. Project name and post username should be strings.")
     if not isinstance(post_data[2], str):
-        print("Invalid project data. Post social media should be a string.")
-        return
+        raise TypeError("Invalid project data. Post social media should be a string.")
     if not isinstance(post_data[3], datetime):
-        print("Invalid project data. Post time posted should be a datetime object.")
-        return
+        raise TypeError("Invalid project data. Post time posted should be a datetime object.")
     
     #check if project exists
     if fetch_project(connection, post_data[0]) is None:
-        print("The project \"" + post_data[0] + "\" associated with this post doesn't exist in the database.")
-        return
+        raise ValueError("The project \"" + post_data[0] + "\" associated with this post doesn't exist in the database.")
     
     #check if post exists
     if fetch_post(connection, post_data[1], post_data[2], post_data[3]) is None:
-        print("Post does not yet exist in the database.")
-        return
+        raise ValueError("Post does not yet exist in the database.")
     
     with connection.cursor() as cursor:
         find_proj_fields_query = """
@@ -203,8 +179,7 @@ def insert_post_no_data(connection, post_data):
         field_names = cursor.fetchone()
 
     if len(field_names) == 0:
-        print("This post is not associated with a project that contains fields. Project \"" + post_data[0] + "\" has no fields.")
-        return
+        raise ValueError("This post is not associated with a project that contains fields. Project \"" + post_data[0] + "\" has no fields.")
     
     f = StringIO(field_names[0])
     reader = csv.reader(f)
@@ -219,35 +194,27 @@ def insert_post_no_data(connection, post_data):
             cursor.execute(insert_query, tuple(post_data) + (field,))
         connection.commit()
 
-# KATHERINE
-        
+# USED WITH NEW DATA ENTRY METHOD  
 def insert_field_values(connection, project_data):
     #Labels: project_name,post_username,post_social_media,post_time_posted,field,result
     
-    #check if the correct spot for data entry exists
-    if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]) is None:
-        print("The project/post/field combo you are trying to insert data for is incorrect: " + project_data)
-        return
-    
     #check if project_data is valid
     if len(project_data) != 6:
-        print("Invalid project data. Expected 6 fields.")
-        return
+        raise ValueError("Invalid project data. Expected 6 fields.")
     if not isinstance(project_data[0], str) or not isinstance(project_data[1], str):
-        print("Invalid project data. Project name and post username should be strings.")
-        return
+        raise TypeError("Invalid project data. Project name and post username should be strings.")
     if not isinstance(project_data[2], str):
-        print("Invalid project data. Post social media should be a string.")
-        return
+        raise TypeError("Invalid project data. Post social media should be a string.")
     if not isinstance(project_data[3], datetime):
-        print("Invalid project data. Post time posted should be a datetime object.")
-        return
+        raise TypeError("Invalid project data. Post time posted should be a datetime object.")
     if not isinstance(project_data[4], str):
-        print("Invalid project data. Field should be a string.")
-        return
+        raise TypeError("Invalid project data. Field should be a string.")
     if not isinstance(project_data[5], str):
-        print("Invalid project data. Result should be a string.")
-        return
+        raise TypeError("Invalid project data. Result should be a string.")
+     
+    #check if the correct spot for data entry exists
+    if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]) is None:
+        raise ValueError("The project/post/field combo you are trying to insert data for is incorrect: " + project_data)
     
     with connection.cursor() as cursor:
         update_query = """
@@ -331,7 +298,9 @@ def fetch_all_projectdata(connection): # Returns all project data in the databas
         result = cursor.fetchall()
     return result
 
-#functions for the queries described in the project description pdf
+# individual functions for the queries described in the project description pdf (probably don't use since we have the all-purpose function now)
+# NOT implementing error checking here becuase I don't think we will even use these.
+
 #find posts of a social media type
 def fetch_posts_socialmedia(connection, social_media):
     with connection.cursor() as cursor:
@@ -341,7 +310,6 @@ def fetch_posts_socialmedia(connection, social_media):
         cursor.execute(select_query, (social_media,))
         result = cursor.fetchall()
     return result
-
 #Find posts between a certain period of time
 def fetch_posts_betweentime(connection, beginning_time, ending_time):
     
@@ -356,7 +324,6 @@ def fetch_posts_betweentime(connection, beginning_time, ending_time):
         cursor.execute(select_query, (beginning_date_time, ending_date_time)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
         result = cursor.fetchall()
     return result
-
 #Find posts that is posted by a certain username of a certain media
 def fetch_posts_user(connection, user, social_media):
     with connection.cursor() as cursor:
@@ -366,7 +333,6 @@ def fetch_posts_user(connection, user, social_media):
         cursor.execute(select_query, (user, social_media))
         result = cursor.fetchall()
     return result
-
 #Find posts that is posted by someone with a certain first/last name
 def fetch_posts_twonames(connection, first_name, last_name):
     with connection.cursor() as cursor:
@@ -380,8 +346,19 @@ def fetch_posts_twonames(connection, first_name, last_name):
         result = cursor.fetchall()
     return result
 
-#Query for all 4 at once
+#Query for all 4 at once (This is the correct one we should use, so I added error checking)
 def fetch_posts_all4(connection, social_media, beginning_time, ending_time, username, first_name, last_name):
+    
+    # checking data types
+    if not isinstance(social_media, str):
+        raise TypeError("Invalid query data. Social media should be a string.")
+    if not isinstance(beginning_time, datetime) or not isinstance(ending_time, datetime):
+        raise TypeError("Invalid query data. Beginning and ending times should be datetime.")
+    if not isinstance(username, str):
+        raise TypeError("Invalid query data. Username should be a string.")
+    if not isinstance(first_name, str) or not isinstance(last_name, str):
+        raise TypeError("Invalid query data. First name and last name should be a strings.")
+
     with connection.cursor() as cursor:
         query = """
         SELECT p.*
@@ -418,14 +395,21 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
 #has been entered. Also you need to display for each field, the percentage of posts that contain a
 #value of that field.
 
+# might need to change our interpretation of this function depending on Lin's email
+
 def fetch_posts_experiment(connection, project_name): #not sure for this one if we just need the primary key of the post, or the actual post text itself
+    
+    # checking data type
+    if not isinstance(project_name, str):
+        raise TypeError("Invalid query data. Project name should be a string.")
+    
     with connection.cursor() as cursor:
         select_query1 = """
         SELECT *
         FROM ProjectData
         WHERE project_name = %s;
         """
-        cursor.execute(select_query1, (project_name,)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        cursor.execute(select_query1, (project_name,))
         result1 = cursor.fetchall()
 
         select_query2 = """
@@ -434,6 +418,6 @@ def fetch_posts_experiment(connection, project_name): #not sure for this one if 
         WHERE project_name = %s
         GROUP BY field;
         """
-        cursor.execute(select_query2, (project_name,)) # NEED TO ERROR HANDLE THIS FOR NOT CORRECT INPUTS
+        cursor.execute(select_query2, (project_name,))
         result2 = cursor.fetchall()
     return result1, result2
