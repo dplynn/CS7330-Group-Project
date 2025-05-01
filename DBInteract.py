@@ -27,13 +27,17 @@ def insert_user(connection, user_data): # Insert user data into the database
     if fetch_user(connection, user_data[0], user_data[1]) is not None:
         raise ValueError("User already exists in the database.")
 
-    with connection.cursor() as cursor:
-        insert_query = """
-        INSERT INTO user (username,social_media,first_name,last_name,country_birth,country_residence,age,gender,verified)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(insert_query, user_data)
-    connection.commit()   
+    try:
+        with connection.cursor() as cursor:
+            insert_query = """
+            INSERT INTO user (username,social_media,first_name,last_name,country_birth,country_residence,age,gender,verified)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, user_data)
+        connection.commit()  
+    except pymysql.MySQLError as e:
+        print(f"Error adding user to database: {e}")
+
 
 def insert_post(connection, post_data): # Insert post data into the database
     #username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted,orig_text
@@ -71,6 +75,15 @@ def insert_post(connection, post_data): # Insert post data into the database
     # check if posts already exists
     if fetch_post(connection, post_data[0], post_data[1], post_data[2]) is not None:
         raise ValueError("Post already exists in the database.")
+    
+    # check if user already exist
+    if fetch_user(connection, post_data[0], post_data[1]) is None:
+        raise ValueError("User doesn't exist in the database.")
+    
+    # check if the orginal posts exists in case of repost
+    if post_data[10]:
+        if fetch_post(connection, post_data[11], post_data[12], post_data[13]) is None:
+            raise ValueError("Original post does not exist in database.")
 
     #convert orig_user, orig_social_media, orig_time_posted, orig_text to null if is_repost is False
     if not post_data[10]:
@@ -79,13 +92,16 @@ def insert_post(connection, post_data): # Insert post data into the database
         post_data[13] = None
         post_data[14] = None
 
-    with connection.cursor() as cursor:
-        insert_query = """
-        INSERT INTO Post (username, social_media, time_posted, text, city, state, country, num_likes, num_dislikes, multimedia, is_repost, orig_user, orig_social_media, orig_time_posted, orig_text)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(insert_query, post_data)
-    connection.commit()
+    try:
+        with connection.cursor() as cursor:
+            insert_query = """
+            INSERT INTO Post (username, social_media, time_posted, text, city, state, country, num_likes, num_dislikes, multimedia, is_repost, orig_user, orig_social_media, orig_time_posted, orig_text)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, post_data)
+        connection.commit()
+    except pymysql.MySQLError as e:
+        print(f"Error adding post to database: {e}")
 
 def insert_project(connection, project_data): # Insert projects into the database
     #project_name, project_manager, institute, field_names, start_date, end_date
@@ -109,13 +125,16 @@ def insert_project(connection, project_data): # Insert projects into the databas
     if fetch_project(connection, project_data[0]) is not None:
         raise ValueError("Project already exists in the database.")
     
-    with connection.cursor() as cursor:
-        insert_query = """
-        INSERT INTO Project (project_name, project_manager, institute, field_names, start_date, end_date)
-        VALUES (%s, %s, %s, %s,%s, %s)
-        """
-        cursor.execute(insert_query, project_data)
-    connection.commit()
+    try:
+        with connection.cursor() as cursor:
+            insert_query = """
+            INSERT INTO Project (project_name, project_manager, institute, field_names, start_date, end_date)
+            VALUES (%s, %s, %s, %s,%s, %s)
+            """
+            cursor.execute(insert_query, project_data)
+        connection.commit()
+    except pymysql.MySQLError as e:
+        print(f"Error adding project to database: {e}")
 
 # USED WITH OLD DATA ENTRY METHOD
 def insert_projectdata(connection, project_data): # Insert project data into the database
@@ -139,13 +158,16 @@ def insert_projectdata(connection, project_data): # Insert project data into the
     if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3]) is not None: # CHANGED TO INCLUDE project_data[4] since field is now part of the primary key
         raise ValueError("ProjectData already exists in the database.")
     
-    with connection.cursor() as cursor:
-        insert_query = """
-        INSERT INTO ProjectData (project_name, post_username, post_social_media, post_time_posted, field, result)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(insert_query, project_data)
-    connection.commit()
+    try:
+        with connection.cursor() as cursor:
+            insert_query = """
+            INSERT INTO ProjectData (project_name, post_username, post_social_media, post_time_posted, field, result)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, project_data)
+        connection.commit()
+    except pymysql.MySQLError as e:
+        print(f"Error adding project data to database: {e}")
 
 # USED WITH NEW DATA ENTRY METHOD
 def insert_post_no_data(connection, post_data): 
@@ -169,14 +191,17 @@ def insert_post_no_data(connection, post_data):
     if fetch_post(connection, post_data[1], post_data[2], post_data[3]) is None:
         raise ValueError("Post does not yet exist in the database.")
     
-    with connection.cursor() as cursor:
-        find_proj_fields_query = """
-        SELECT field_names 
-        FROM Project
-        WHERE project_name = %s
-        """
-        cursor.execute (find_proj_fields_query,post_data[0])
-        field_names = cursor.fetchone()
+    try:
+        with connection.cursor() as cursor:
+            find_proj_fields_query = """
+            SELECT field_names 
+            FROM Project
+            WHERE project_name = %s
+            """
+            cursor.execute (find_proj_fields_query,post_data[0])
+            field_names = cursor.fetchone()
+    except pymysql.MySQLError as e:
+        print(f"Error searching project for fields: {e}")
 
     if len(field_names) == 0:
         raise ValueError("This post is not associated with a project that contains fields. Project \"" + post_data[0] + "\" has no fields.")
@@ -185,14 +210,17 @@ def insert_post_no_data(connection, post_data):
     reader = csv.reader(f)
     field_list = next(reader)  
 
-    for field in field_list:
-        with connection.cursor() as cursor:
-            insert_query = """
-            INSERT INTO ProjectData (project_name, post_username, post_social_media, post_time_posted, field)
-            VALUES (%s, %s, %s, %s, %s)
-            """
-            cursor.execute(insert_query, tuple(post_data) + (field,))
-        connection.commit()
+    try:
+        for field in field_list:
+            with connection.cursor() as cursor:
+                insert_query = """
+                INSERT INTO ProjectData (project_name, post_username, post_social_media, post_time_posted, field)
+                VALUES (%s, %s, %s, %s, %s)
+                """
+                cursor.execute(insert_query, tuple(post_data) + (field,))
+            connection.commit()
+    except pymysql.MySQLError as e:
+        print(f"Error adding project/post/field combo to database: {e}")
 
 # USED WITH NEW DATA ENTRY METHOD  
 def insert_field_values(connection, project_data):
@@ -216,87 +244,114 @@ def insert_field_values(connection, project_data):
     if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]) is None:
         raise ValueError("The project/post/field combo you are trying to insert data for is incorrect: " + project_data)
     
-    with connection.cursor() as cursor:
-        update_query = """
-        UPDATE ProjectData
-        SET result = %s
-        WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s AND field = %s;
-        """
-        cursor.execute(update_query, (project_data[5], project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]))
-    connection.commit()
+    try:
+        with connection.cursor() as cursor:
+            update_query = """
+            UPDATE ProjectData
+            SET result = %s
+            WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s AND field = %s;
+            """
+            cursor.execute(update_query, (project_data[5], project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]))
+        connection.commit()
+    except pymysql.MySQLError as e:
+        print(f"Error adding field value to database: {e}")
 
 def fetch_user(connection, username, social_media): # Fetch user data from the database
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM user WHERE username = %s AND social_media = %s;
-        """
-        cursor.execute(select_query, (username, social_media))
-        result = cursor.fetchone()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM user WHERE username = %s AND social_media = %s;
+            """
+            cursor.execute(select_query, (username, social_media))
+            result = cursor.fetchone()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching user in database: {e}")
 
 def fetch_post(connection, username, social_media, time_posted): # Fetch post data from the database
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM Post WHERE username = %s AND social_media = %s AND time_posted = %s;
-        """
-        cursor.execute(select_query, (username, social_media, time_posted))
-        result = cursor.fetchone()
-    return result
+    try:  
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM Post WHERE username = %s AND social_media = %s AND time_posted = %s;
+            """
+            cursor.execute(select_query, (username, social_media, time_posted))
+            result = cursor.fetchone()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching post in database: {e}")
 
 def fetch_project(connection, project_name): # Fetch a project from the database
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM Project WHERE project_name = %s;
-        """
-        cursor.execute(select_query, (project_name,))
-        result = cursor.fetchone()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM Project WHERE project_name = %s;
+            """
+            cursor.execute(select_query, (project_name,))
+            result = cursor.fetchone()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching project in database: {e}")
 
 def fetch_projectdata(connection, project_name, post_username, post_social_media, post_time_posted, field): # Fetch project data from the database
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM ProjectData WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s AND field = %s;
-        """
-        cursor.execute(select_query, (project_name, post_username, post_social_media, post_time_posted, field))
-        result = cursor.fetchone()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM ProjectData WHERE project_name = %s AND post_username = %s AND post_social_media = %s AND post_time_posted = %s AND field = %s;
+            """
+            cursor.execute(select_query, (project_name, post_username, post_social_media, post_time_posted, field))
+            result = cursor.fetchone()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching project data in database: {e}")
 
 def fetch_all_users(connection): # Returns all users in the database
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM user;
-        """
-        cursor.execute(select_query)
-        result = cursor.fetchall()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM user;
+            """
+            cursor.execute(select_query)
+            result = cursor.fetchall()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching all users in database: {e}")
 
 def fetch_all_posts(connection): # Returns all posts in the database
     result = []
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM Post;
-        """
-        cursor.execute(select_query)
-        result = cursor.fetchall()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM Post;
+            """
+            cursor.execute(select_query)
+            result = cursor.fetchall()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching all posts in database: {e}")
 
 def fetch_all_projects(connection): # Returns all projects in the database
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM Project;
-        """
-        cursor.execute(select_query)
-        result = cursor.fetchall()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM Project;
+            """
+            cursor.execute(select_query)
+            result = cursor.fetchall()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching all projects in database: {e}")
 
 def fetch_all_projectdata(connection): # Returns all project data in the database
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM ProjectData;
-        """
-        cursor.execute(select_query)
-        result = cursor.fetchall()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT * FROM ProjectData;
+            """
+            cursor.execute(select_query)
+            result = cursor.fetchall()
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error fetching all project data in database: {e}")
 
 # individual functions for the queries described in the project description pdf (probably don't use since we have the all-purpose function now)
 # NOT implementing error checking here becuase I don't think we will even use these.
@@ -358,37 +413,40 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
         raise TypeError("Invalid query data. Username should be a string.")
     if not isinstance(first_name, str) or not isinstance(last_name, str):
         raise TypeError("Invalid query data. First name and last name should be a strings.")
+    
+    try:
+        with connection.cursor() as cursor:
+            query = """
+            SELECT p.*
+            FROM Post p, user u
+            WHERE (p.username = u.username AND p.social_media = u.social_media)
+            """
+            params = []
 
-    with connection.cursor() as cursor:
-        query = """
-        SELECT p.*
-        FROM Post p, user u
-        WHERE (p.username = u.username AND p.social_media = u.social_media)
-        """
-        params = []
+            if social_media:
+                query += " AND p.social_media = %s"
+                params.append(social_media)
 
-        if social_media:
-            query += " AND p.social_media = %s"
-            params.append(social_media)
+            if beginning_time and ending_time:
+                query += " AND p.time_posted BETWEEN %s AND %s"
+                params.extend([beginning_time, ending_time])
 
-        if beginning_time and ending_time:
-            query += " AND p.time_posted BETWEEN %s AND %s"
-            params.extend([beginning_time, ending_time])
+            if username:
+                query += " AND p.username = %s"
+                params.append(username)
 
-        if username:
-            query += " AND p.username = %s"
-            params.append(username)
+            if first_name and last_name:
+                query += " AND u.first_name = %s AND u.last_name = %s"
+                params.extend([first_name, last_name])
 
-        if first_name and last_name:
-            query += " AND u.first_name = %s AND u.last_name = %s"
-            params.extend([first_name, last_name])
+            query += " ORDER BY p.time_posted;"  # Optional: nice to sort by time
 
-        query += " ORDER BY p.time_posted;"  # Optional: nice to sort by time
+            cursor.execute(query, params)
+            result = cursor.fetchall()
 
-        cursor.execute(query, params)
-        result = cursor.fetchall()
-
-    return result
+        return result
+    except pymysql.MySQLError as e:
+        print(f"Error executing query in database: {e}")
 
 #Querying experiment: You should ask the user for the name of the experiment, and it should
 #return the list of posts that is associated with the experiment, and for each post, any results that
@@ -403,21 +461,24 @@ def fetch_posts_experiment(connection, project_name): #not sure for this one if 
     if not isinstance(project_name, str):
         raise TypeError("Invalid query data. Project name should be a string.")
     
-    with connection.cursor() as cursor:
-        select_query1 = """
-        SELECT *
-        FROM ProjectData
-        WHERE project_name = %s;
-        """
-        cursor.execute(select_query1, (project_name,))
-        result1 = cursor.fetchall()
+    try:
+        with connection.cursor() as cursor:
+            select_query1 = """
+            SELECT *
+            FROM ProjectData
+            WHERE project_name = %s;
+            """
+            cursor.execute(select_query1, (project_name,))
+            result1 = cursor.fetchall()
 
-        select_query2 = """
-        SELECT field, ROUND((SUM(CASE WHEN result IS NOT NULL AND result != 'None' THEN 1 ELSE 0 END) * 100.0) / COUNT(*), 2) AS percentage_filled
-        FROM ProjectData
-        WHERE project_name = %s
-        GROUP BY field;
-        """
-        cursor.execute(select_query2, (project_name,))
-        result2 = cursor.fetchall()
-    return result1, result2
+            select_query2 = """
+            SELECT field, ROUND((SUM(CASE WHEN result IS NOT NULL AND result != 'None' THEN 1 ELSE 0 END) * 100.0) / COUNT(*), 2) AS percentage_filled
+            FROM ProjectData
+            WHERE project_name = %s
+            GROUP BY field;
+            """
+            cursor.execute(select_query2, (project_name,))
+            result2 = cursor.fetchall()
+        return result1, result2
+    except pymysql.MySQLError as e:
+        print(f"Error executing query in database: {e}")
