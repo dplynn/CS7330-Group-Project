@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Database Manager{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    {% include 'navbar.html' %}
+    <a href="{{ url_for('index') }}"><h1>Database Manager</h1></a>
+    {% include 'nav.html' %}
 
     <div class="content">
         {% block content %}{% endblock %}

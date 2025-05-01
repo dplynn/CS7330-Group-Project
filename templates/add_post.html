@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Post - Database Manager{% endblock %}
+
+{% block content %}
+
+<script src="{{ url_for('static', filename='add_post.js') }}"></script>
+
+<h2>Enter post data</h2>
+<form method="POST">
+    <div id="posts-container">
+        <!-- posts will go here -->
+    </div>
+
+    <button type="button" onclick="addPost()">Add Another Post</button><br><br>
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}

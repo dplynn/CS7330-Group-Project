@@ -4,21 +4,21 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Database Manager</title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     </head>
 
     <body class="landing-page">
-        <a href="main.html"><h1>Database Manager</h1></a>
+        <a href="{{ url_for('index') }}"><h1>Database Manager</h1></a>
 
         <ul>
             <li class="dropdown">
                 <a href="" class="dropbtn">Data Entry</a>
                 <div class="dropdown-content">
-                    <a href="add_user.html">Add User</a>
-                    <a href="add_project.html">Add Project</a>
-                    <a href="add_post.html">Add Post</a>
-                    <a href="add_ptp.html">Add Post to Project</a>
-                    <a href="add_result.html">Add Result</a>
+                    <a href="{{ url_for('add_user') }}">Add User</a>
+                    <a href="{{ url_for('add_project') }}">Add Project</a>
+                    <a href="{{ url_for('add_post') }}">Add Post</a>
+                    <a href="{{ url_for('add_ptp') }}">Add Post to Project</a>
+                    <a href="{{ url_for('add_result') }}">Add Result</a>
                 </div>
             </li>
             <li class="dropdown">

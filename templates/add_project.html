@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Project - Database Manager{% endblock %}
+
+{% block content %}
+
+<script src="{{ url_for('static', filename='add_project.js') }}"></script>
+
+<h2>Enter project data</h2>
+<form method="POST">
+    <label for="project_name">Project Name:</label>
+    <input type="text" name="project_name"><br>
+    <label for="manager">Project Manager:</label>
+    <input type="text" name="manager"><br>
+    <label for="institute">Institute:</label>
+    <input type="text" name="institute"><br>
+    <label for="start">Start Date:</label>
+    <input type="date" name="start"><br>
+    <label for="end">End Date:</label>
+    <input type="date" name="end"><br>
+
+    <div id="fields-container">
+        <!-- fields will be added here -->
+    </div>
+
+    <button type="button" onclick="addField()">Add More Fields</button><br><br>
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}
