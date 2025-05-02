@@ -131,8 +131,32 @@ def add_post2():
     
     return render_template('add_post2.html')
 
-@app.route('/add-project')
+@app.route('/add-project', methods=['GET', 'POST'])
 def add_project():
+    if request.method == 'POST':
+        print("Form data received:", request.form)
+
+        user = [
+            request.form['project_name'],
+            request.form['manager'],
+            request.form['institute'],
+            ','.join(request.form.getlist('field_name[]')),
+            datetime.strptime(request.form['start'], '%Y-%m-%d'),
+            datetime.strptime(request.form['end'], '%Y-%m-%d')
+        ]
+
+        connection = DBInit.connect_to_database()
+        try:
+            DBInteract.insert_project(connection, user)
+            connection.commit()
+            flash('Project added successfully!\n', 'success')
+        except Exception as e:
+            connection.rollback()
+            flash(f"Error: {e}", 'danger')
+        finally:
+            connection.close()
+        return redirect(url_for('add_project'))
+
     return render_template('add_project.html')
 
 @app.route('/add-post-to-project')
