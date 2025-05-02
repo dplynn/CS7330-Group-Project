@@ -136,7 +136,7 @@ def add_project():
     if request.method == 'POST':
         print("Form data received:", request.form)
 
-        user = [
+        project = [
             request.form['project_name'],
             request.form['manager'],
             request.form['institute'],
@@ -147,7 +147,7 @@ def add_project():
 
         connection = DBInit.connect_to_database()
         try:
-            DBInteract.insert_project(connection, user)
+            DBInteract.insert_project(connection, project)
             connection.commit()
             flash('Project added successfully!\n', 'success')
         except Exception as e:
@@ -159,8 +159,29 @@ def add_project():
 
     return render_template('add_project.html')
 
-@app.route('/add-post-to-project')
+@app.route('/add-post-to-project', methods=['GET', 'POST'])
 def add_ptp():
+    if request.method == 'POST':
+        print("Form data received:", request.form)
+
+        data = [
+            request.form['project_name'],
+            request.form['username'],
+            request.form['social_media'],
+            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M')
+        ]
+
+        connection = DBInit.connect_to_database()
+        try:
+            DBInteract.insert_post_no_data(connection, data)
+            connection.commit()
+            flash('Post added to project successfully!\n', 'success')
+        except Exception as e:
+            connection.rollback()
+            flash(f"Error: {e}", 'danger')
+        finally:
+            connection.close()
+        return redirect(url_for('add_ptp'))
     return render_template('add_ptp.html')
 
 @app.route('/add-result')

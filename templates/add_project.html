@@ -4,19 +4,6 @@
 
 {% block content %}
 
-<!-- Display flash messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
-
 <script src="{{ url_for('static', filename='add_project.js') }}"></script>
 
 <h2>Enter project data</h2>
