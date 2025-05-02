@@ -8,16 +8,11 @@
 
 <h2>Enter project data</h2>
 <form method="POST" action="{{ url_for('add_project') }}">
-    <label for="project_name">Project Name:</label>
-    <input type="text" name="project_name"><br>
-    <label for="manager">Project Manager:</label>
-    <input type="text" name="manager"><br>
-    <label for="institute">Institute:</label>
-    <input type="text" name="institute"><br>
-    <label for="start">Start Date:</label>
-    <input type="date" name="start"><br>
-    <label for="end">End Date:</label>
-    <input type="date" name="end"><br>
+    <label for="project_name">Project Name:</label> <input type="text" name="project_name" required><br>
+    <label for="manager">Project Manager:</label> <input type="text" name="manager" required><br>
+    <label for="institute">Institute:</label> <input type="text" name="institute" required><br>
+    <label for="start">Start Date:</label> <input type="date" name="start" required><br>
+    <label for="end">End Date:</label> <input type="date" name="end" required><br>
 
     <div id="fields-container">
         <!-- fields will be added here -->
