@@ -40,13 +40,13 @@ def insert_user(connection, user_data): # Insert user data into the database
 
 
 def insert_post(connection, post_data): # Insert post data into the database
-    #username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted,orig_text
+    #username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted
     
     post_data = list(post_data) if isinstance(post_data, tuple) else post_data
     
     #check if post_data is valid
-    if len(post_data) != 15:
-        raise ValueError("Invalid post data. Expected 15 fields.")
+    if len(post_data) != 14:
+        raise ValueError("Invalid post data. Expected 14 fields, got " + str(len(post_data)) + ".")
     if not isinstance(post_data[0], str) or not isinstance(post_data[1], str):
         # print types for debugging
         print(f"Username type: {type(post_data[0])}, Social media type: {type(post_data[1])}")
@@ -63,12 +63,12 @@ def insert_post(connection, post_data): # Insert post data into the database
         raise ValueError("Invalid post data. Number of likes and dislikes should be positive integers.")
     if not isinstance(post_data[9], bool) or not isinstance(post_data[10], bool):
         raise TypeError("Invalid post data. Multimedia and is repost should be boolean values.")
-    if post_data[10] and (post_data[11] is None or post_data[12] is None or post_data[14] is None):
-        raise ValueError("Invalid post data. Original user, social media, time posted, and text should not be None if is repost is True.")
+    if post_data[10] and (post_data[11] is None or post_data[12] is None):
+        raise ValueError("Invalid post data. Original user, social media and time posted should not be None if is repost is True.")
     if post_data[10] and (not isinstance(post_data[11], str) or not isinstance(post_data[12], str)):
         #types for debugging
-        print(f"Original user type: {type(post_data[11])}, Original social media type: {type(post_data[12])}, Original text type: {type(post_data[14])}")
-        raise TypeError("Invalid post data. Original user, social media, and text should be strings.")
+        print(f"Original user type: {type(post_data[11])}, Original social media type: {type(post_data[12])}")
+        raise TypeError("Invalid post data. Original user and social media should be strings.")
     if not isinstance(post_data[13], datetime):
         raise TypeError("Invalid post data. Original time posted should be a datetime object.")
     
@@ -85,18 +85,16 @@ def insert_post(connection, post_data): # Insert post data into the database
         if fetch_post(connection, post_data[11], post_data[12], post_data[13]) is None:
             raise ValueError("Original post does not exist in database.")
 
-    #convert orig_user, orig_social_media, orig_time_posted, orig_text to null if is_repost is False
+    #convert orig_user, orig_social_media, orig_time_posted to null if is_repost is False
     if not post_data[10]:
         post_data[11] = None
         post_data[12] = None
         post_data[13] = None
-        post_data[14] = None
-
     try:
         with connection.cursor() as cursor:
             insert_query = """
-            INSERT INTO Post (username, social_media, time_posted, text, city, state, country, num_likes, num_dislikes, multimedia, is_repost, orig_user, orig_social_media, orig_time_posted, orig_text)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO Post (username, social_media, time_posted, text, city, state, country, num_likes, num_dislikes, multimedia, is_repost, orig_user, orig_social_media, orig_time_posted)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             cursor.execute(insert_query, post_data)
         connection.commit()

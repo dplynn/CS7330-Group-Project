@@ -64,7 +64,6 @@ def create_tables(connection): #Creates the tables in the database
             orig_user VARCHAR(40),
             orig_social_media VARCHAR(40),
             orig_time_posted DATETIME,
-            orig_text TEXT,
             PRIMARY KEY (username, social_media, time_posted),
             FOREIGN KEY (username, social_media) REFERENCES user(username, social_media),
             FOREIGN KEY (orig_user, orig_social_media) REFERENCES user(username, social_media)
@@ -167,8 +166,8 @@ def read_user_data(file_path): #Reads the user data from a CSV file and returns 
     return user_data
 
 def read_post_data(file_path): #Reads the post data from a CSV file and returns it as a list of tuples, for testing ONLY
-    #Labels: username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted,orig_text
-    df = pd.read_csv(file_path, skiprows=1, header=None, names=['username', 'social_media', 'time_posted', 'text', 'city', 'state', 'country', 'num_likes', 'num_dislikes', 'multimedia', 'is_repost', 'orig_user', 'orig_social_media', 'orig_time_posted', 'orig_text'])
+    #Labels: username,social_media,time_posted,text,city,state,country,num_likes,num_dislikes,multimedia,is_repost,orig_user,orig_social_media,orig_time_posted
+    df = pd.read_csv(file_path, skiprows=1, header=None, names=['username', 'social_media', 'time_posted', 'text', 'city', 'state', 'country', 'num_likes', 'num_dislikes', 'multimedia', 'is_repost', 'orig_user', 'orig_social_media', 'orig_time_posted'])
     # Convert the 'time_posted' column to datetime
     df['time_posted'] = pd.to_datetime(df['time_posted'], errors='coerce')
     # Convert the 'orig_time_posted' column to datetime, if it doesnt exist, set it to None
@@ -202,7 +201,6 @@ def read_post_data(file_path): #Reads the post data from a CSV file and returns 
         print("Invalid multimedia or is_repost values found and removed from the DataFrame.")
     # remove emojis
     df['text'] = df['text'].str.replace(r'[^\x00-\x7F]+', '', regex=True)
-    df['orig_text'] = df['orig_text'].str.replace(r'[^\x00-\x7F]+', '', regex=True)
     # convert username, social_media, city, state, country, orig_user, orig_social_media to string
     df['username'] = df['username'].astype(str)
     df['social_media'] = df['social_media'].astype(str)

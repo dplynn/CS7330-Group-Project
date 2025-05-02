@@ -64,8 +64,9 @@ def add_post():
         if request.form['is_repost'] == 'yes':
             session['repost_data'] = post
             return redirect(url_for('add_post2'))
-        
-        post_list = list(post.values()) + [None, None, pd.NaT, None]
+        print("Post data: " + str(post))
+        post_list = list(post.values()) + [None, None, pd.NaT]
+        print("Post List: " + str(post_list))  
         print(post_list)
 
         connection = DBInit.connect_to_database()
@@ -93,8 +94,6 @@ def add_post2():
         post['orig_user'] = request.form['orig_user']
         post['orig_platform'] = request.form['orig_platform']
         post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M')
-        post['orig_text'] = request.form['orig_text']
-
         post_list = [
             post['username'],
             post['social_media'],
@@ -109,8 +108,7 @@ def add_post2():
             post['is_repost'],
             post['orig_user'], 
             post['orig_platform'], 
-            post['orig_time'], 
-            post['orig_text']
+            post['orig_time'] 
         ]
 
         print("Post + Repost Data: " + str(post_list))
