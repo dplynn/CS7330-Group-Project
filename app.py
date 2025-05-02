@@ -184,12 +184,48 @@ def add_ptp():
         return redirect(url_for('add_ptp'))
     return render_template('add_ptp.html')
 
-@app.route('/add-result')
+@app.route('/add-result', methods=['GET', 'POST'])
 def add_result():
+    if request.method == 'POST':
+        session.pop('repost_data', None)
+        session['project_data'] = {'project_name': request.form['project_name']}
+        
+        return redirect(url_for('add_result2'))
+
     return render_template('add_result.html')
 
-@app.route('/add-result2')
+@app.route('/add-result2', methods=['GET', 'POST'])
 def add_result2():
+    project_data = session.get('project_data')
+    print("Session data in add_result2:", session)
+    print("Form data received:", request.form)
+
+    if request.method == 'POST':
+        result = [
+            project_data['project_name'],
+            request.form['username'],
+            request.form['media_platform'],
+            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M'),
+            request.form['field'],
+            request.form['result']
+        ]
+
+        print("Result data: " + str(result))
+
+        connection = DBInit.connect_to_database()
+
+        try:
+            DBInteract.insert_field_values(connection, result)
+            connection.commit()
+            flash('Result added successfully!\n', 'success')
+        except Exception as e:
+            connection.rollback()
+            flash(f"Error: {e}", 'danger')
+        finally:
+            connection.close()
+
+        return redirect(url_for('add_result'))
+    
     return render_template('add_result2.html')
 
 if __name__ == '__main__':
