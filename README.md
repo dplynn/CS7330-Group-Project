@@ -5,6 +5,7 @@ Database Creation (Davis) - **DONE**\
 Insert Statements for Each Table (Davis)\
     * Done, but Foreign Keys are NYI for the sake of testing\
 UI (Bonita)\
+Integrate frontend with backend (Bonita)\
 Querying Statements / General Implementation (Lucas)\
 Report / Demo (Katherine)\
 Instalation / User Manual (Katherine) \
