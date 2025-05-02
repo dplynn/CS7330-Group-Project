@@ -228,6 +228,10 @@ def add_result2():
     
     return render_template('add_result2.html')
 
+@app.route('/query-posts', methods=['GET', 'POST'])
+def query_posts():
+    return render_template('query_posts.html')
+
 if __name__ == '__main__':
     try:
         connection = DBInit.connect_to_database()
