@@ -61,7 +61,7 @@ def add_post():
             'is_repost': request.form['is_repost'] == 'yes'
         }
 
-        if request.form['is_repost'] == True:
+        if request.form['is_repost'] == 'yes':
             session['repost_data'] = post
             return redirect(url_for('add_post2'))
         
@@ -86,9 +86,49 @@ def add_post():
 
 @app.route('/add-post-original', methods=['GET', 'POST'])
 def add_post2():
+    post = session.get('repost_data')
+    print("Form data received:", request.form)
+
     if request.method == 'POST':
-        flash("Repost handled and saved!", "success")
+        post['orig_user'] = request.form['orig_user']
+        post['orig_platform'] = request.form['orig_platform']
+        post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M')
+        post['orig_text'] = request.form['orig_text']
+
+        post_list = [
+            post['username'],
+            post['social_media'],
+            post['time_posted'],
+            post['text'],
+            post['city'],
+            post['state'],
+            post['country'],
+            post['num_likes'],
+            post['num_dislikes'],
+            post['multimedia'],
+            post['is_repost'],
+            post['orig_user'], 
+            post['orig_platform'], 
+            post['orig_time'], 
+            post['orig_text']
+        ]
+
+        print("Post + Repost Data: " + str(post_list))
+
+        connection = DBInit.connect_to_database()
+
+        try:
+            DBInteract.insert_post(connection, post_list)
+            connection.commit()
+            flash('Post added successfully!\n', 'success')
+        except Exception as e:
+            connection.rollback()
+            flash(f"Error: {e}", 'danger')
+        finally:
+            connection.close()
+
         return redirect(url_for('add_post'))
+    
     return render_template('add_post2.html')
 
 @app.route('/add-project')
