@@ -356,13 +356,23 @@ def fetch_all_projectdata(connection): # Returns all project data in the databas
 
 #find posts of a social media type
 def fetch_posts_socialmedia(connection, social_media):
-    with connection.cursor() as cursor:
-        select_query = """
-        SELECT * FROM Post WHERE social_media = %s;
-        """
-        cursor.execute(select_query, (social_media,))
-        result = cursor.fetchall()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            select_query = """
+            SELECT DISTINCT p.*, pd.project_name, pd.field, pd.result
+            FROM Post p
+            LEFT JOIN ProjectData pd ON 
+                p.username = pd.post_username 
+                AND p.social_media = pd.post_social_media 
+                AND p.time_posted = pd.post_time_posted
+            WHERE p.social_media = %s
+            ORDER BY p.time_posted;
+            """
+            cursor.execute(select_query, (social_media,))
+            result = cursor.fetchall()
+        return result
+    except pymysql.MySQLError as e:
+        raise Exception(f"Error fetching posts by social media in database: {e}")
 #Find posts between a certain period of time
 def fetch_posts_betweentime(connection, beginning_time, ending_time):
     
@@ -415,9 +425,14 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
     try:
         with connection.cursor() as cursor:
             query = """
-            SELECT p.text, p.social_media, p.username, p.time_posted
-            FROM Post p, user u
-            WHERE (p.username = u.username AND p.social_media = u.social_media)
+            SELECT DISTINCT p.text,p.social_media,p.username,p.time_posted, pd.project_name, pd.field, pd.result
+            FROM Post p
+            LEFT JOIN user u ON p.username = u.username AND p.social_media = u.social_media
+            LEFT JOIN ProjectData pd ON 
+                p.username = pd.post_username 
+                AND p.social_media = pd.post_social_media 
+                AND p.time_posted = pd.post_time_posted
+            WHERE 1=1
             """
             params = []
 
@@ -437,7 +452,7 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
                 query += " AND u.first_name = %s AND u.last_name = %s"
                 params.extend([first_name, last_name])
 
-            query += " ORDER BY p.time_posted;"  # Optional: nice to sort by time
+            query += " ORDER BY p.time_posted;"
 
             cursor.execute(query, params)
             result = cursor.fetchall()
@@ -445,6 +460,7 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
         return result
     except pymysql.MySQLError as e:
         print(f"Error executing query in database: {e}")
+        return None
 
 #Querying experiment: You should ask the user for the name of the experiment, and it should
 #return the list of posts that is associated with the experiment, and for each post, any results that
