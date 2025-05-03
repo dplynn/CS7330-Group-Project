@@ -226,6 +226,30 @@ def add_result2():
     
     return render_template('add_result2.html')
 
+@app.route('/query-posts', methods=['GET', 'POST'])
+def query_posts():
+    return render_template('query_posts.html')
+
+@app.route('/query-posts-results.html', methods=['GET', 'POST'])
+def query_posts_results():
+    connection = DBInit.connect_to_database()
+
+    try:
+        results = DBInteract.fetch_posts_all4(connection, request.args.get('social_media'),
+                                    datetime.strptime(request.args.get('start_time'), '%Y-%m-%dT%H:%M'),
+                                    datetime.strptime(request.args.get('end_time'), '%Y-%m-%dT%H:%M'),
+                                    request.args.get('username'), request.args.get('first_name'), 
+                                    request.args.get('last_name'))
+        print(str(results))
+    except Exception as e:
+        connection.rollback()
+        flash(f"Error: {e}", 'danger')
+        return redirect(url_for('query_posts'))
+    finally:
+        connection.close()
+
+    return render_template('query_posts_results.html', results=results)
+
 if __name__ == '__main__':
     try:
         connection = DBInit.connect_to_database()
