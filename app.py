@@ -241,6 +241,7 @@ def query_posts_results():
                                     request.args.get('username'), request.args.get('first_name'), 
                                     request.args.get('last_name'))
         print(str(results))
+
     except Exception as e:
         connection.rollback()
         flash(f"Error: {e}", 'danger')

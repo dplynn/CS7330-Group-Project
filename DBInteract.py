@@ -415,7 +415,7 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
     try:
         with connection.cursor() as cursor:
             query = """
-            SELECT p.*
+            SELECT p.text, p.social_media, p.username, p.time_posted
             FROM Post p, user u
             WHERE (p.username = u.username AND p.social_media = u.social_media)
             """
