@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Query Results - Database Manager{% endblock %}
+
+{% block content %}
+
+{% if results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Social Media</th>
+                <th>Time Posted</th>
+                <th>Text</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Country</th>
+                <th>Likes</th>
+                <th>Dislikes</th>
+                <th>Multimedia</th>
+                <th>Repost</th>
+                <th>Original Username</th>
+                <th>Original Social Media</th>
+                <th>Original Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in results %}
+            <tr>
+                {% for col in post %}
+                <td>{{ col }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    <p>No results found.</p>
+{% endif %}
+
+{% endblock %}
