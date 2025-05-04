@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Query Posts - Database Manager{% endblock %}
+
+{% block content %}
+
+{% if result1 %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Username</th>
+                <th>Social Media</th>
+                <th>Time Posted</th>
+                <th>Field</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in result1 %}
+            <tr>
+                {% for col in row %}
+                <td>{{ col }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    <p>No results found.</p>
+{% endif %}
+
+{% if result2 %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Field Name</th>
+                <th>% of Posts with Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in result2 %}
+            <tr>
+                {% for col in row %}
+                <td>{{ col }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    <p>No fields found.</p>
+{% endif %}
+
+{% endblock %}

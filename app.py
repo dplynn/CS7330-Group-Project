@@ -251,6 +251,29 @@ def query_posts_results():
 
     return render_template('query_posts_results.html', results=results)
 
+@app.route('/query-projects', methods=['GET', 'POST'])
+def query_projects():
+    return render_template('query_projects.html')
+
+@app.route('/query-projects-results', methods=['GET', 'POST'])
+def query_projects_results():
+    connection = DBInit.connect_to_database()
+
+    try:
+        result1, result2 = DBInteract.fetch_posts_experiment(connection, request.args.get('project_name'))
+        result2 = [(field, f"{float(percent):.0f}%") for field, percent in result2]
+        print(str(result1))
+        print(str(result2))
+
+    except Exception as e:
+        connection.rollback()
+        flash(f"Error: {e}", 'danger')
+        return redirect(url_for('query_posts'))
+    finally:
+        connection.close()
+
+    return render_template('query_projects_results.html', result1=result1, result2=result2)
+
 if __name__ == '__main__':
     try:
         connection = DBInit.connect_to_database()
