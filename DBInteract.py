@@ -69,7 +69,7 @@ def insert_post(connection, post_data): # Insert post data into the database
         #types for debugging
         print(f"Original user type: {type(post_data[11])}, Original social media type: {type(post_data[12])}")
         raise TypeError("Invalid post data. Original user and social media should be strings.")
-    if not isinstance(post_data[13], datetime):
+    if post_data[10] and (not isinstance(post_data[13], datetime)):
         raise TypeError("Invalid post data. Original time posted should be a datetime object.")
     
     # check if posts already exists
@@ -415,8 +415,9 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
     # checking data types
     if not isinstance(social_media, str):
         raise TypeError("Invalid query data. Social media should be a string.")
-    if not isinstance(beginning_time, datetime) or not isinstance(ending_time, datetime):
-        raise TypeError("Invalid query data. Beginning and ending times should be datetime.")
+    if beginning_time is not None and ending_time is not None:
+        if not isinstance(beginning_time, datetime) or not isinstance(ending_time, datetime):
+            raise TypeError("Invalid query data. Beginning and ending times should be datetime.")
     if not isinstance(username, str):
         raise TypeError("Invalid query data. Username should be a string.")
     if not isinstance(first_name, str) or not isinstance(last_name, str):
@@ -425,15 +426,20 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
     try:
         with connection.cursor() as cursor:
             query = """
-            SELECT DISTINCT p.text,p.social_media,p.username,p.time_posted, pd.project_name
-            FROM Post p
-            LEFT JOIN user u ON p.username = u.username AND p.social_media = u.social_media
-            LEFT JOIN ProjectData pd ON 
-                p.username = pd.post_username 
-                AND p.social_media = pd.post_social_media 
-                AND p.time_posted = pd.post_time_posted
-            WHERE 1=1
-            """
+                SELECT 
+                    p.text,
+                    p.social_media,
+                    p.username,
+                    p.time_posted,
+                    GROUP_CONCAT(DISTINCT pd.project_name SEPARATOR ', ') AS project_names
+                FROM Post p
+                LEFT JOIN user u ON p.username = u.username AND p.social_media = u.social_media
+                LEFT JOIN ProjectData pd ON 
+                    p.username = pd.post_username 
+                    AND p.social_media = pd.post_social_media 
+                    AND p.time_posted = pd.post_time_posted
+                WHERE 1=1
+                """
             params = []
 
             if social_media:
@@ -452,12 +458,16 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
                 query += " AND u.first_name = %s AND u.last_name = %s"
                 params.extend([first_name, last_name])
 
-            query += " ORDER BY p.time_posted;"
+            query += """
+            GROUP BY p.text, p.social_media, p.username, p.time_posted
+            ORDER BY p.time_posted;
+            """
 
             cursor.execute(query, params)
             result = cursor.fetchall()
 
         return result
+    
     except pymysql.MySQLError as e:
         print(f"Error executing query in database: {e}")
         return None

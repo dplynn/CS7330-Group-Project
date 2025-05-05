@@ -330,23 +330,29 @@ def query_posts():
 def query_posts_results():
     connection = DBInit.connect_to_database()
 
-    try:
-        start_time = datetime.strptime(request.args.get('start_time'), '%Y-%m-%dT%H:%M:%S')
-    except ValueError:
-        # Append ":00" if seconds are missing and try again
-        time_str = request.args.get('start_time')
-        if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
-            time_str += ':00'
-        start_time = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
+    start_time_str = request.args.get('start_time')
+    end_time_str = request.args.get('end_time')
 
-    try:
-        end_time = datetime.strptime(request.args.get('end_time'), '%Y-%m-%dT%H:%M:%S')
-    except ValueError:
-        # Append ":00" if seconds are missing and try again
-        time_str = request.args.get('end_time')
-        if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
-            time_str += ':00'
-        end_time = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')   
+    start_time = None
+    end_time = None
+
+    # Parse start_time only if provided
+    if start_time_str:
+        try:
+            start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            if len(start_time_str) == 16:  # e.g., no seconds
+                start_time_str += ':00'
+                start_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%S')
+
+    # Parse end_time only if provided
+    if end_time_str:
+        try:
+            end_time = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            if len(end_time_str) == 16:  # e.g., no seconds
+                end_time_str += ':00'
+                end_time = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%S')   
 
     try:
         results = DBInteract.fetch_posts_all4(connection, request.args.get('social_media'),
