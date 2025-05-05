@@ -3,10 +3,18 @@ import DBInit
 import DBInteract
 from datetime import datetime
 import pandas as pd
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-app.secret_key = 'bonita123'
 
+# set secret key from env variable
+load_dotenv()
+app.secret_key = os.environ.get('SECRET_KEY')
+if not app.secret_key:
+    raise ValueError("No secret key set for Flask application!")
+
+# homepage
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -14,8 +22,9 @@ def index():
 @app.route('/add-user', methods=['GET', 'POST'])
 def add_user():
     if request.method == 'POST':
-        print("Form data received:", request.form)
+        print("Form data received:", request.form) # for debugging
 
+        # format form data into list for insert_user()
         user = [
             request.form['username'],
             request.form['social_media'],
@@ -25,7 +34,7 @@ def add_user():
             request.form['country_residence'],
             int(request.form['age']),
             request.form['gender'],
-            request.form['verified'] == 'yes'  # Convert 'yes'/'no' to boolean
+            request.form['verified'] == 'yes'  # convert 'yes'/'no' to boolean
         ]
 
         connection = DBInit.connect_to_database()
@@ -45,8 +54,9 @@ def add_user():
 @app.route('/add-post', methods=['GET', 'POST'])
 def add_post():
     if request.method == 'POST':
-        print("Form data received:", request.form)
+        print("Form data received:", request.form) # for debugging
 
+        # format form data into dictionary
         post = {
             'username': request.form['username'],
             'social_media': request.form['social_media'],
@@ -61,10 +71,12 @@ def add_post():
             'is_repost': request.form['is_repost'] == 'yes'
         }
 
+        # if repost, pass form data to add-post-original page
         if request.form['is_repost'] == 'yes':
             session['repost_data'] = post
             return redirect(url_for('add_post2'))
-        print("Post data: " + str(post))
+        
+        # if not repost, make into list for insert_post() and add null values to repost columns
         post_list = list(post.values()) + [None, None, pd.NaT]
         print("Post List: " + str(post_list))  
         print(post_list)
@@ -91,9 +103,12 @@ def add_post2():
     print("Form data received:", request.form)
 
     if request.method == 'POST':
+        # add original post data to dictionary
         post['orig_user'] = request.form['orig_user']
         post['orig_platform'] = request.form['orig_platform']
         post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M')
+
+        # format data into list for insert_post()
         post_list = [
             post['username'],
             post['social_media'],
@@ -111,7 +126,7 @@ def add_post2():
             post['orig_time'] 
         ]
 
-        print("Post + Repost Data: " + str(post_list))
+        print("Post + Repost Data: " + str(post_list)) # for debug
 
         connection = DBInit.connect_to_database()
 
@@ -132,13 +147,18 @@ def add_post2():
 @app.route('/add-project', methods=['GET', 'POST'])
 def add_project():
     if request.method == 'POST':
-        print("Form data received:", request.form)
+        print("Form data received:", request.form) # for debug
 
+        # format data into list for insert_project()
         project = [
             request.form['project_name'],
             request.form['manager'],
             request.form['institute'],
+
+            # format fields to csv string
             ','.join(request.form.getlist('field_name[]')),
+
+            # format to datetime
             datetime.strptime(request.form['start'], '%Y-%m-%d'),
             datetime.strptime(request.form['end'], '%Y-%m-%d')
         ]
@@ -160,8 +180,9 @@ def add_project():
 @app.route('/add-post-to-project', methods=['GET', 'POST'])
 def add_ptp():
     if request.method == 'POST':
-        print("Form data received:", request.form)
+        print("Form data received:", request.form) # for debug
 
+        # format into list for insert_post_no_data()
         data = [
             request.form['project_name'],
             request.form['username'],
@@ -185,6 +206,7 @@ def add_ptp():
 @app.route('/add-result', methods=['GET', 'POST'])
 def add_result():
     if request.method == 'POST':
+        # save form data to session for passing to add-result2
         session.pop('repost_data', None)
         session['project_data'] = {'project_name': request.form['project_name']}
         
@@ -195,10 +217,13 @@ def add_result():
 @app.route('/add-result2', methods=['GET', 'POST'])
 def add_result2():
     project_data = session.get('project_data')
+
+    # for debug
     print("Session data in add_result2:", session)
     print("Form data received:", request.form)
 
     if request.method == 'POST':
+        # format into list for insert_field_values()
         result = [
             project_data['project_name'],
             request.form['username'],
@@ -208,7 +233,7 @@ def add_result2():
             request.form['result']
         ]
 
-        print("Result data: " + str(result))
+        print("Result data: " + str(result)) # for debug
 
         connection = DBInit.connect_to_database()
 
@@ -261,7 +286,11 @@ def query_projects_results():
 
     try:
         result1, result2 = DBInteract.fetch_posts_experiment(connection, request.args.get('project_name'))
+
+        # format decimal values into %
         result2 = [(field, f"{float(percent):.0f}%") for field, percent in result2]
+
+        # debug
         print(str(result1))
         print(str(result2))
 
@@ -274,6 +303,7 @@ def query_projects_results():
 
     return render_template('query_projects_results.html', result1=result1, result2=result2)
 
+# set up database on startup
 if __name__ == '__main__':
     try:
         connection = DBInit.connect_to_database()

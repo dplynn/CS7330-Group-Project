@@ -4,3 +4,5 @@ DB_Info.csv
 # Ignore virtual environment folder
 .venv/
 venv/
+
+.env
