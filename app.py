@@ -143,10 +143,20 @@ def add_post2():
     print("Form data received:", request.form)
 
     if request.method == 'POST':
+        
+        try:
+            post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            # Append ":00" if seconds are missing and try again
+            time_str = request.form['orig_time']
+            if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
+                time_str += ':00'
+            post['orig_time'] = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
+        
         # add original post data to dictionary
         post['orig_user'] = request.form['orig_user']
         post['orig_platform'] = request.form['orig_platform']
-        post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M:%S')
+        #post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M:%S')
 
         # format data into list for insert_post()
         post_list = [
@@ -222,12 +232,22 @@ def add_ptp():
     if request.method == 'POST':
         print("Form data received:", request.form) # for debug
 
+        try:
+            time_posted = datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            # Append ":00" if seconds are missing and try again
+            time_str = request.form['time_posted']
+            if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
+                time_str += ':00'
+            time_posted = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
+        
         # format into list for insert_post_no_data()
         data = [
             request.form['project_name'],
             request.form['username'],
             request.form['social_media'],
-            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S')
+            time_posted
+            #datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S')
         ]
 
         connection = DBInit.connect_to_database()
@@ -261,14 +281,25 @@ def add_result2():
     # for debug
     print("Session data in add_result2:", str(session))
     print("Form data received:", str(request.form))
-
+    
     if request.method == 'POST':
+
+        try:
+            time_posted = datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            # Append ":00" if seconds are missing and try again
+            time_str = request.form['time_posted']
+            if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
+                time_str += ':00'
+            time_posted = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
+
         # format into list for insert_field_values()
         result = [
             project_data['project_name'],
             request.form['username'],
             request.form['media_platform'],
-            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S'),
+            time_posted,
+            #datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S'),
             request.form['field'],
             request.form['result']
         ]
@@ -300,9 +331,29 @@ def query_posts_results():
     connection = DBInit.connect_to_database()
 
     try:
+        start_time = datetime.strptime(request.args.get('start_time'), '%Y-%m-%dT%H:%M:%S')
+    except ValueError:
+        # Append ":00" if seconds are missing and try again
+        time_str = request.args.get('start_time')
+        if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
+            time_str += ':00'
+        start_time = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
+
+    try:
+        end_time = datetime.strptime(request.args.get('end_time'), '%Y-%m-%dT%H:%M:%S')
+    except ValueError:
+        # Append ":00" if seconds are missing and try again
+        time_str = request.args.get('end_time')
+        if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
+            time_str += ':00'
+        end_time = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')   
+
+    try:
         results = DBInteract.fetch_posts_all4(connection, request.args.get('social_media'),
-                                    datetime.strptime(request.args.get('start_time'), '%Y-%m-%dT%H:%M:%S'),
-                                    datetime.strptime(request.args.get('end_time'), '%Y-%m-%dT%H:%M:%S'),
+                                    start_time,
+                                    #datetime.strptime(request.args.get('start_time'), '%Y-%m-%dT%H:%M:%S'),
+                                    end_time,
+                                    #datetime.strptime(request.args.get('end_time'), '%Y-%m-%dT%H:%M:%S'),
                                     request.args.get('username'), request.args.get('first_name'), 
                                     request.args.get('last_name'))
         print(str(results))
