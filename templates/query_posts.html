@@ -8,8 +8,15 @@
 
 <form method="GET" action="{{ url_for('query_posts_results') }}">
     <label for="social_media">Social Media Platform:</label> <input type="text" name="social_media"><br>
-    <label for="start_time">Start Time:</label> <input type="datetime-local" name="start_time"><br>
-    <label for="end_time">End Time:</label> <input type="datetime-local" name="end_time"><br>
+
+    <label for="start_time">Start Time:
+        <span style="cursor: help;" title="If seconds not available, please input 00.">ℹ️</span>
+    </label> <input type="datetime-local" name="start_time" step=1><br>
+
+    <label for="end_time">End Time:
+        <span style="cursor: help;" title="If seconds not available, please input 00.">ℹ️</span>
+    </label> <input type="datetime-local" name="end_time" step=1><br>
+
     <label for="username">Username:</label> <input type="text" name="username"><br>
     <label for="first_name">First Name:</label> <input type="text" name="first_name"><br>
     <label for="last_name">Last Name:</label> <input type="text" name="last_name"><br><br>

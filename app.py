@@ -60,7 +60,7 @@ def add_post():
         post = {
             'username': request.form['username'],
             'social_media': request.form['social_media'],
-            'time_posted': datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M'),
+            'time_posted': datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S'),
             'text': request.form['text'],
             'city': request.form['city'],
             'state': request.form['state'],
@@ -106,7 +106,7 @@ def add_post2():
         # add original post data to dictionary
         post['orig_user'] = request.form['orig_user']
         post['orig_platform'] = request.form['orig_platform']
-        post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M')
+        post['orig_time'] = datetime.strptime(request.form['orig_time'], '%Y-%m-%dT%H:%M:%S')
 
         # format data into list for insert_post()
         post_list = [
@@ -187,7 +187,7 @@ def add_ptp():
             request.form['project_name'],
             request.form['username'],
             request.form['social_media'],
-            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M')
+            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S')
         ]
 
         connection = DBInit.connect_to_database()
@@ -228,7 +228,7 @@ def add_result2():
             project_data['project_name'],
             request.form['username'],
             request.form['media_platform'],
-            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M'),
+            datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S'),
             request.form['field'],
             request.form['result']
         ]
@@ -261,8 +261,8 @@ def query_posts_results():
 
     try:
         results = DBInteract.fetch_posts_all4(connection, request.args.get('social_media'),
-                                    datetime.strptime(request.args.get('start_time'), '%Y-%m-%dT%H:%M'),
-                                    datetime.strptime(request.args.get('end_time'), '%Y-%m-%dT%H:%M'),
+                                    datetime.strptime(request.args.get('start_time'), '%Y-%m-%dT%H:%M:%S'),
+                                    datetime.strptime(request.args.get('end_time'), '%Y-%m-%dT%H:%M:%S'),
                                     request.args.get('username'), request.args.get('first_name'), 
                                     request.args.get('last_name'))
         print(str(results))

@@ -11,7 +11,9 @@
     <h2>Enter the post for which you are entering a result</h2>
     <label for="username">Username:</label> <input type="text" name="username" required><br>
     <label for="media_platform">Social Media Platform:</label> <input type="text" name="media_platform" required><br>
-    <label for="time_posted">Time Posted:</label> <input type="datetime-local" name="time_posted" required><br><br>
+    <label for="time_posted">Time Posted:
+        <span style="cursor: help;" title="If seconds not available, please input 00.">ℹ️</span>
+    </label> <input type="datetime-local" name="time_posted" step=1 required><br><br>
 
     <h2>Enter result</h2>
     <label for="result">Result:</label> <input type="text" name="result" required><br><br>

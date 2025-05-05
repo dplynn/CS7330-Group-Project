@@ -8,8 +8,12 @@
 <form method="POST">
     <div id="posts-container">
         <label for="orig_user">Username:</label> <input type="text" name="orig_user" required><br>
-        <label for="orig_platform">Social Media Platform:</label> <input type="text" name="orig_platform" required><br>
-        <label for="orig_time">Time Posted:</label> <input type="datetime-local" name="orig_time" required><br>
+
+        <label for="orig_platform">Social Media Platform:
+            <span style="cursor: help;" title="If seconds not available, please input 00.">ℹ️</span>
+        </label> <input type="text" name="orig_platform" required><br>
+
+        <label for="orig_time">Time Posted:</label> <input type="datetime-local" name="orig_time" step=1 required><br>
         <br><br>
     </div>
 
