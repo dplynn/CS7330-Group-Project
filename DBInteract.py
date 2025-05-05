@@ -425,7 +425,7 @@ def fetch_posts_all4(connection, social_media, beginning_time, ending_time, user
     try:
         with connection.cursor() as cursor:
             query = """
-            SELECT DISTINCT p.text,p.social_media,p.username,p.time_posted, pd.project_name, pd.field, pd.result
+            SELECT DISTINCT p.text,p.social_media,p.username,p.time_posted, pd.project_name
             FROM Post p
             LEFT JOIN user u ON p.username = u.username AND p.social_media = u.social_media
             LEFT JOIN ProjectData pd ON 

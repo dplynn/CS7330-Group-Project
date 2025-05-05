@@ -25,6 +25,21 @@ def add_user():
         print("Form data received:", request.form) # for debugging
 
         # format form data into list for insert_user()
+        try:
+            age = int(request.form['age'])
+        except ValueError:
+            age = 0
+
+        try:
+            gender = request.form['gender']
+        except KeyError:
+            gender = "NA"
+
+        try:
+            verified = request.form['verified'] == 'yes'  # convert 'yes'/'no' to boolean
+        except KeyError:
+            verified = False
+
         user = [
             request.form['username'],
             request.form['social_media'],
@@ -32,9 +47,9 @@ def add_user():
             request.form['last_name'],
             request.form['country_birth'],
             request.form['country_residence'],
-            int(request.form['age']),
-            request.form['gender'],
-            request.form['verified'] == 'yes'  # convert 'yes'/'no' to boolean
+            age,
+            gender,
+            verified
         ]
 
         connection = DBInit.connect_to_database()
@@ -57,6 +72,21 @@ def add_post():
         print("Form data received:", request.form) # for debugging
 
         # format form data into dictionary
+        try:
+            num_likes = int(request.form['num_likes'])
+        except (ValueError, KeyError):
+            num_likes = 0
+
+        try:
+            num_dislikes = int(request.form['num_dislikes'])
+        except (ValueError, KeyError):
+            num_dislikes = 0
+
+        try:
+            multimedia = request.form['multimedia'] == 'yes'
+        except KeyError:
+            multimedia = bool(0)
+
         post = {
             'username': request.form['username'],
             'social_media': request.form['social_media'],
@@ -65,9 +95,9 @@ def add_post():
             'city': request.form['city'],
             'state': request.form['state'],
             'country': request.form['country'],
-            'num_likes': int(request.form['num_likes']),
-            'num_dislikes': int(request.form['num_dislikes']),
-            'multimedia': request.form['multimedia'] == 'yes',
+            'num_likes': num_likes,
+            'num_dislikes': num_dislikes,
+            'multimedia': multimedia,
             'is_repost': request.form['is_repost'] == 'yes'
         }
 
