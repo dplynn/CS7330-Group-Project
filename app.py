@@ -86,11 +86,21 @@ def add_post():
             multimedia = request.form['multimedia'] == 'yes'
         except KeyError:
             multimedia = bool(0)
+        from datetime import datetime
+
+        try:
+            time_posted = datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            # Append ":00" if seconds are missing and try again
+            time_str = request.form['time_posted']
+            if len(time_str) == 16:  # Format is '%Y-%m-%dT%H:%M'
+                time_str += ':00'
+            time_posted = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
 
         post = {
             'username': request.form['username'],
             'social_media': request.form['social_media'],
-            'time_posted': datetime.strptime(request.form['time_posted'], '%Y-%m-%dT%H:%M:%S'),
+            'time_posted': time_posted,
             'text': request.form['text'],
             'city': request.form['city'],
             'state': request.form['state'],
