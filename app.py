@@ -219,8 +219,8 @@ def add_result2():
     project_data = session.get('project_data')
 
     # for debug
-    print("Session data in add_result2:", session)
-    print("Form data received:", request.form)
+    print("Session data in add_result2:", str(session))
+    print("Form data received:", str(request.form))
 
     if request.method == 'POST':
         # format into list for insert_field_values()

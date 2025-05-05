@@ -240,7 +240,7 @@ def insert_field_values(connection, project_data):
      
     #check if the correct spot for data entry exists
     if fetch_projectdata(connection, project_data[0], project_data[1], project_data[2], project_data[3], project_data[4]) is None:
-        raise ValueError("The project/post/field combo you are trying to insert data for is incorrect: " + project_data)
+        raise ValueError("The project/post/field combo you are trying to insert data for is incorrect: " + str(project_data))
     
     try:
         with connection.cursor() as cursor:
