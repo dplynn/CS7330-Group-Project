@@ -1,11 +1,9 @@
 import pymysql
 import csv
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 import csv
 from io import StringIO
-
-# SHOULD PROBABLY ADD A TRY CATCH BLOCK FOR EVERY SQL FUNCTION JUST TO BE SAFE
 
 def insert_user(connection, user_data): # Insert user data into the database
 
@@ -51,7 +49,11 @@ def insert_post(connection, post_data): # Insert post data into the database
         # print types for debugging
         print(f"Username type: {type(post_data[0])}, Social media type: {type(post_data[1])}")
         raise TypeError("Invalid post data. Username and social media should be strings.")
-    if not isinstance(post_data[2], datetime):
+    #if not isinstance(post_data[2], datetime):
+        #raise TypeError("Invalid post data. Time posted should be a datetime object.")
+    if isinstance(post_data[2], datetime):
+        post_data[2] = post_data[2] if post_data[2].tzinfo else post_data[2].replace(tzinfo=timezone.utc)
+    else:
         raise TypeError("Invalid post data. Time posted should be a datetime object.")
     if not isinstance(post_data[3], str):
         raise TypeError("Invalid post data. Text should be a string.")
@@ -69,8 +71,16 @@ def insert_post(connection, post_data): # Insert post data into the database
         #types for debugging
         print(f"Original user type: {type(post_data[11])}, Original social media type: {type(post_data[12])}")
         raise TypeError("Invalid post data. Original user and social media should be strings.")
-    if post_data[10] and (not isinstance(post_data[13], datetime)):
-        raise TypeError("Invalid post data. Original time posted should be a datetime object.")
+    #if post_data[10] and (not isinstance(post_data[13], datetime)):
+        #raise TypeError("Invalid post data. Original time posted should be a datetime object.")
+    if post_data[10] and isinstance(post_data[13], datetime):
+            post_data[13] = post_data[13] if post_data[13].tzinfo else post_data[13].replace(tzinfo=timezone.utc)
+    else:
+        if post_data[10]:
+            raise TypeError("Invalid post data. Original time posted should be a datetime object.")
+    if post_data[10] and post_data[2] < post_data[13]:
+        print(f"Original post date: {post_data[13]}, Repost date: {post_data[2]}")
+        raise ValueError("Invalid post data. Repost date should be later than orginal post date.")
     
     # check if posts already exists
     if fetch_post(connection, post_data[0], post_data[1], post_data[2]) is not None:
@@ -188,6 +198,11 @@ def insert_post_no_data(connection, post_data):
     #check if post exists
     if fetch_post(connection, post_data[1], post_data[2], post_data[3]) is None:
         raise ValueError("Post does not yet exist in the database.")
+    
+    results = fetch_project(connection, post_data[0])
+    proj_end_date = results[5]
+    if post_data[3] > proj_end_date:
+        raise ValueError("The post was posted after the project ended.")
     
     try:
         with connection.cursor() as cursor:

@@ -2,6 +2,7 @@ import pymysql
 import csv
 import pandas as pd
 import datetime
+
 def connect_to_database(): #Connect to the database using pymysql
     csv_file_path = 'DB_Info.csv'
 
