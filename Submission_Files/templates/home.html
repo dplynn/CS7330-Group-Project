@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Database Manager</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+
+    <body class="landing-page">
+        <a href="{{ url_for('index') }}"><h1>Database Manager</h1></a>
+
+        <ul>
+            <li class="dropdown">
+                <a href="" class="dropbtn">Data Entry</a>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('add_user') }}">Add User</a>
+                    <a href="{{ url_for('add_project') }}">Add Project</a>
+                    <a href="{{ url_for('add_post') }}">Add Post</a>
+                    <a href="{{ url_for('add_ptp') }}">Add Post to Project</a>
+                    <a href="{{ url_for('add_result') }}">Add Result</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="" class="dropbtn">Data Query</a>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('query_posts') }}">Query Posts</a>
+                    <a href="{{ url_for('query_projects') }}">Query Projects</a>
+                </div>
+            </li>
+        </ul>
+
+    </body>
+</html>

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Query Posts Results - Database Manager{% endblock %}
+
+{% block content %}
+
+{% if results %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Text</th>
+                <th>Social Media</th>
+                <th>Username</th>
+                <th>Time Posted</th>
+                <th>Project</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in results %}
+            <tr>
+                {% for col in post %}
+                <td>{{ col }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    <p>No results found.</p>
+{% endif %}
+
+{% endblock %}

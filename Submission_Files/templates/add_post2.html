@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Post - Database Manager{% endblock %}
+
+{% block content %}
+
+<h2>Enter original post data</h2>
+<form method="POST">
+    <div id="posts-container">
+        <label for="orig_user">Username:</label> <input type="text" name="orig_user" required><br>
+
+        <label for="orig_platform">Social Media Platform:
+            <span style="cursor: help;" title="If seconds not available, please input 00.">ℹ️</span>
+        </label> <input type="text" name="orig_platform" required><br>
+
+        <label for="orig_time">Time Posted:</label> <input type="datetime-local" name="orig_time" step=1 required><br>
+        <br><br>
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}

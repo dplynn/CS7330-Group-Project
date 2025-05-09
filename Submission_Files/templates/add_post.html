@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Post - Database Manager{% endblock %}
+
+{% block content %}
+
+<h2>Enter post data</h2>
+<form method="POST" action="/add-post">
+    <div id="posts-container">
+        <label for="username">Username:</label> <input type="text" name="username" required><br>
+        <label for="social_media">Social Media Platform:</label> <input type="text" name="social_media" required><br>
+        
+        <label for="time_posted">Time Posted:
+            <span style="cursor: help;" title="If seconds not available, please input 00.">ℹ️</span>
+        </label> <input type="datetime-local" name="time_posted" step=1 required><br>
+        
+        <label for="text">Text:</label> <input type="text" name="text" required><br>
+        <label for="city">City:</label> <input type="text" name="city"><br>
+        <label for="state">State:</label> <input type="text" name="state"><br>
+        <label for="country">Country:</label> <input type="text" name="country"><br>
+        <label for="num_likes">Number of Likes:</label> <input type="number" name="num_likes"><br>
+        <label for="num_dislikes">Number of Dislikes:</label> <input type="number" name="num_dislikes"><br>
+
+        <label for="multimedia">Does the post include multimedia?</label>
+        <select name="multimedia" id="multimedia">
+            <option value="" disabled selected></option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select><br>
+
+        <label for="is_repost">Is the post a repost?</label>
+        <select name="is_repost" id="is_repost" required>
+            <option value="" disabled selected></option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select><br><br>
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Post to Project - Database Manager{% endblock %}
+
+{% block content %}
+
+<form method="POST">
+    <h2>Enter project name</h2>
+    <label for="project_name">Project Name:</label> <input type="text" name="project_name" required><br><br>
+
+    <h2>Enter data for existing post</h2>
+    <label for="username">Username:</label> <input type="text" name="username" required><br>
+    <label for="social_media">Social Media Platform:</label> <input type="text" name="social_media" required><br>
+    
+    <label for="time_posted">Time Posted:
+        <span style="cursor: help;" title="If seconds not available, please input 00.">ℹ️</span>
+    </label> <input type="datetime-local" name="time_posted" step=1 required><br><br>
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}
