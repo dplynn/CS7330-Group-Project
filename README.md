@@ -7,9 +7,8 @@
 
 **app.py** - Generates GUI and ties all 3 files together. 
 
+If you would like to run the full, standalone version, please download the code in the Submission_Files folder. 
+
 ### CSV File Descriptions:
 **DB_info.csv** - Database connection info, **change before running** \
-**user_data.csv** - fake user data, can be read in through DBInit.read_user_data \
-**post_data.csv** - fake post data, can be read in through DBInit.read_post_data \
-**project_data.csv** - fake project data, can be read in through DBInit.read_project_data \
-**projectdata_data.csv** - fake project data(table) data, can be read in through DBInit.read_projectdata_data\
+
