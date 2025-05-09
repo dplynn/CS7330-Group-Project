@@ -10,5 +10,5 @@
 If you would like to run the full, standalone version, please download the code in the Submission_Files folder. 
 
 ### CSV File Descriptions:
-**DB_info.csv** - Database connection info, **change before running** \
+**DB_info.csv** - Database connection info, **change before running**
 
